@@ -1,0 +1,147 @@
+###############################################################################
+# Frontend pipeline
+#
+# build  ->  sync to S3  ->  invalidate CloudFront
+#
+# Two things people get wrong here and this workflow gets right.
+#
+# 1. Cache headers are set per object class, not globally. Vite fingerprints
+#    every file it puts in assets, so those can be immutable for a year.
+#    index.html must never be cached or visitors keep loading a stale bundle
+#    that points at deleted asset hashes.
+#
+# 2. The sync runs before the invalidation, and the invalidation is waited on.
+#    Invalidating first would just re-cache the old objects.
+###############################################################################
+
+name: frontend deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  NODE_VERSION: "20"
+
+jobs:
+  build:
+    name: build and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: build
+        working-directory: frontend
+        env:
+          # Injected at build time. Vite inlines it into the bundle, so this is
+          # a public value by definition. Never put a secret in a VITE_ variable.
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+        run: npm run build
+
+      - name: report the bundle size
+        working-directory: frontend
+        run: |
+          {
+            echo "### Bundle"
+            echo ""
+            echo '```'
+            du -ah dist | sort -h | tail -20
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: assume the frontend deploy role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_FRONTEND_ROLE_ARN }}
+          role-session-name: gha-frontend-deploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Fingerprinted assets first. New files land before index.html starts
+      # pointing at them, so there is no window where the page references an
+      # asset that is not in the bucket yet.
+      - name: sync fingerprinted assets
+        working-directory: frontend
+        run: |
+          aws s3 sync dist "s3://${{ vars.S3_BUCKET }}" \
+            --delete \
+            --exclude "*" \
+            --include "assets/*" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --no-progress
+
+      - name: sync everything else
+        working-directory: frontend
+        run: |
+          aws s3 sync dist "s3://${{ vars.S3_BUCKET }}" \
+            --delete \
+            --exclude "assets/*" \
+            --cache-control "public, max-age=0, must-revalidate" \
+            --no-progress
+
+      - name: invalidate the cloudfront cache
+        id: invalidate
+        run: |
+          INVALIDATION_ID=$(aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text)
+          echo "id=${INVALIDATION_ID}" >> "$GITHUB_OUTPUT"
+          echo "Created invalidation ${INVALIDATION_ID}"
+
+      - name: wait for the invalidation to complete
+        run: |
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --id "${{ steps.invalidate.outputs.id }}"
+
+      - name: verify the live site
+        run: |
+          SITE_URL="${{ vars.VITE_SITE_URL }}"
+          if [ -z "${SITE_URL}" ]; then
+            echo "VITE_SITE_URL is not set, skipping the live check"
+            exit 0
+          fi
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' "${SITE_URL}")
+          echo "GET ${SITE_URL} returned ${STATUS}"
+          test "${STATUS}" = "200"
+
+      - name: summarize
+        run: |
+          {
+            echo "### Deployed"
+            echo ""
+            echo "- bucket: ${{ vars.S3_BUCKET }}"
+            echo "- distribution: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}"
+            echo "- invalidation: ${{ steps.invalidate.outputs.id }}"
+          } >> "$GITHUB_STEP_SUMMARY"

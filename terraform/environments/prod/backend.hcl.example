@@ -1,0 +1,10 @@
+# Copy to backend.hcl and fill in the two values printed by the bootstrap
+# module, then run: terraform init -backend-config=backend.hcl
+#
+# backend.hcl is gitignored because the bucket name embeds your account id.
+
+bucket         = "cloud-resume-tfstate-000000000000"
+key            = "prod/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "cloud-resume-tf-locks"
+encrypt        = true

@@ -1,0 +1,514 @@
+@import "tailwindcss";
+
+/*
+ * DESIGN SYSTEM
+ *
+ * Apple product page, faithfully. Tailwind 4 keeps configuration in CSS, so
+ * this @theme block is the config: every token here generates real utilities,
+ * so --color-ink gives you text-ink, bg-ink and border-ink.
+ *
+ * The values are Apple's, measured off their live product pages rather than
+ * approximated. #fbfbfd is the page white, #f5f5f7 is the gray they band
+ * sections with, #1d1d1f is the near black they set text in, #6e6e73 is the
+ * gray under every headline, #d2d2d7 is the hairline, and the link blue is
+ * #0066cc on light grounds and #2997ff on dark, because the light mode blue
+ * fails contrast on black.
+ *
+ * THE BAND SYSTEM
+ *
+ * An Apple product page is not one canvas. It is a stack of full bleed bands
+ * that alternate page white, section gray and pure black, and the rhythm of
+ * that alternation is most of what makes the page read as Apple. Because a
+ * band changes the ground under its content, text and border colors cannot be
+ * hardcoded per element. Each band sets its own semantic colors through the
+ * .band classes below, and the content inside uses tone aware classes rather
+ * than picking a literal color.
+ */
+@theme {
+  /* ------------------------------------------------------------- typography */
+  --font-display:
+    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono:
+    "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /*
+   * Fluid type. Apple's headlines are not fixed pixel sizes, they scale with
+   * the viewport, which is why the same page looks composed on a 13 inch
+   * laptop and on a 32 inch display.
+   */
+  --text-display: clamp(2.75rem, 9vw, 6.5rem);
+  --text-display--line-height: 1.02;
+  --text-headline: clamp(2.25rem, 6.4vw, 5rem);
+  --text-headline--line-height: 1.04;
+  --text-stat: clamp(2.5rem, 6vw, 4.5rem);
+  --text-stat--line-height: 1;
+  --text-title: clamp(1.5rem, 3vw, 2.5rem);
+  --text-title--line-height: 1.15;
+  --text-lede: clamp(1.0625rem, 1.45vw, 1.4375rem);
+  --text-lede--line-height: 1.45;
+
+  /* ----------------------------------------------------- light ground tokens */
+  --color-page: #fbfbfd;
+  --color-band: #f5f5f7;
+  --color-card: #ffffff;
+  --color-ink: #1d1d1f;
+  --color-muted: #6e6e73;
+  --color-faint: #86868b;
+  --color-rule: #d2d2d7;
+  --color-rule-soft: #e8e8ed;
+  --color-link: #0066cc;
+
+  /* ------------------------------------------------------ dark ground tokens */
+  --color-onyx: #000000;
+  --color-onyx-card: #1d1d1f;
+  --color-onyx-raised: #262629;
+  --color-chalk: #f5f5f7;
+  --color-chalk-muted: #a1a1a6;
+  --color-chalk-faint: #86868b;
+  --color-onyx-rule: #424245;
+  --color-link-dark: #2997ff;
+
+  /* --------------------------------------------------------------- chrome */
+  --color-nav: #161617;
+  --color-signal: #1d9c4f;
+  --color-signal-dark: #30d158;
+  --color-amber: #a35d00;
+  --color-amber-dark: #ff9f0a;
+
+  /* --------------------------------------------------------------- motion */
+  /*
+   * Apple's house easing. Fast out of the gate, long settle. It is the single
+   * biggest reason their transitions feel expensive and a linear ease feels
+   * cheap.
+   */
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* -------------------------------------------------------------- geometry */
+  --radius-tile: 1.125rem;
+  --radius-hero: 1.75rem;
+}
+
+@layer base {
+  :root {
+    /* The page commits to Apple's light look. It is one designed world with
+     * black bands inside it, not a theme that flips. */
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Clears the sticky product nav when an in page anchor is followed. The
+     * global nav scrolls away, so only 52 pixels plus breathing room. */
+    scroll-padding-top: 4.75rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-link) 22%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* =====================================================================
+     BANDS
+     Each band paints its own ground and declares the semantic colors its
+     content should use. Content inside a band reaches for .band-ink,
+     .band-muted, .band-rule, .band-card and .band-link rather than a
+     literal color, so the same component renders correctly on white, on
+     gray and on black.
+     ===================================================================== */
+  .band {
+    position: relative;
+    --tone-ink: var(--color-ink);
+    --tone-muted: var(--color-muted);
+    --tone-faint: var(--color-faint);
+    --tone-rule: var(--color-rule);
+    --tone-rule-soft: var(--color-rule-soft);
+    --tone-card: var(--color-card);
+    --tone-card-hover: #ffffff;
+    --tone-link: var(--color-link);
+    --tone-signal: var(--color-signal);
+    --tone-shadow: 0 4px 14px -6px rgb(0 0 0 / 0.12), 0 18px 40px -28px rgb(0 0 0 / 0.18);
+    background-color: var(--color-page);
+    color: var(--tone-ink);
+  }
+
+  .band--gray {
+    background-color: var(--color-band);
+  }
+
+  .band--dark {
+    --tone-ink: var(--color-chalk);
+    --tone-muted: var(--color-chalk-muted);
+    --tone-faint: var(--color-chalk-faint);
+    --tone-rule: var(--color-onyx-rule);
+    --tone-rule-soft: #2a2a2d;
+    --tone-card: var(--color-onyx-card);
+    --tone-card-hover: var(--color-onyx-raised);
+    --tone-link: var(--color-link-dark);
+    --tone-signal: var(--color-signal-dark);
+    --tone-shadow: 0 24px 60px -34px rgb(0 0 0 / 0.9);
+    background-color: var(--color-onyx);
+    color: var(--tone-ink);
+  }
+
+  .band-ink {
+    color: var(--tone-ink);
+  }
+
+  .band-muted {
+    color: var(--tone-muted);
+  }
+
+  .band-faint {
+    color: var(--tone-faint);
+  }
+
+  .band-link {
+    color: var(--tone-link);
+  }
+
+  .band-signal {
+    color: var(--tone-signal);
+  }
+
+  .band-rule {
+    border-color: var(--tone-rule);
+  }
+
+  .band-rule-soft {
+    border-color: var(--tone-rule-soft);
+  }
+
+  /* A card on a band. White on light grounds, #1d1d1f on black, which is
+   * exactly how Apple builds their spec tiles and their bento cells. */
+  .band-card {
+    background-color: var(--tone-card);
+    border: 1px solid var(--tone-rule-soft);
+    box-shadow: var(--tone-shadow);
+    transition:
+      background-color 0.4s var(--ease-apple),
+      border-color 0.4s var(--ease-apple),
+      transform 0.4s var(--ease-apple);
+  }
+
+  .band-card:hover {
+    background-color: var(--tone-card-hover);
+    border-color: var(--tone-rule);
+  }
+
+  /* Chip fill that works on either ground. */
+  .band-chip {
+    background-color: color-mix(in srgb, var(--tone-ink) 6%, transparent);
+    color: var(--tone-muted);
+  }
+
+  /* =====================================================================
+     CHROME
+     ===================================================================== */
+
+  /*
+   * Apple's global nav is charcoal at 80 percent with a real backdrop blur,
+   * on light and dark pages alike. Two details do the work: backdrop-blur
+   * needs a translucent background to blur anything, and the links are 12px,
+   * which is far smaller than most people guess.
+   */
+  .global-nav {
+    background-color: color-mix(in srgb, var(--color-nav) 80%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    color: #f5f5f7;
+  }
+
+  /*
+   * The product sub nav. Every Apple product page has one: page colored,
+   * translucent, hairline under it, product name on the left and the buy
+   * action on the right. It is the single most recognizable piece of
+   * furniture on their site after the global nav.
+   */
+  .product-nav {
+    background-color: color-mix(in srgb, var(--color-page) 92%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-rule) 70%, transparent);
+    color: var(--color-ink);
+  }
+
+  /*
+   * Apple's pill button. 980px radius is not a typo, it is the literal value
+   * in their stylesheet, and it is what makes the ends perfectly round at any
+   * height.
+   */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border-radius: 980px;
+    background-color: var(--color-link);
+    color: #ffffff;
+    font-weight: 400;
+    line-height: 1.2;
+    transition:
+      background-color 0.25s var(--ease-apple),
+      transform 0.25s var(--ease-apple);
+  }
+
+  .pill:hover {
+    background-color: #0077ed;
+  }
+
+  .pill:active {
+    transform: scale(0.98);
+  }
+
+  .band--dark .pill {
+    background-color: var(--color-link-dark);
+    color: #000000;
+  }
+
+  .band--dark .pill:hover {
+    background-color: #47a9ff;
+  }
+
+  .pill-quiet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border-radius: 980px;
+    border: 1px solid var(--tone-rule);
+    color: var(--tone-ink);
+    transition:
+      background-color 0.25s var(--ease-apple),
+      border-color 0.25s var(--ease-apple);
+  }
+
+  .pill-quiet:hover {
+    background-color: color-mix(in srgb, var(--tone-ink) 6%, transparent);
+  }
+
+  /*
+   * Apple's text link. Blue, no underline at rest, and a chevron that is part
+   * of the link rather than an icon beside it. The chevron nudges right on
+   * hover, which is the whole interaction.
+   */
+  .chevron-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.2em;
+    color: var(--tone-link);
+    text-decoration: none;
+  }
+
+  .chevron-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .chevron-link::after {
+    content: "\203A";
+    display: inline-block;
+    font-weight: 400;
+    transition: transform 0.25s var(--ease-apple);
+  }
+
+  .chevron-link:hover::after {
+    transform: translateX(3px);
+  }
+
+  /* The same link pointing back. Apple uses this on every article and every
+   * detail page, with the chevron leading rather than trailing. */
+  .chevron-link-back {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.2em;
+    color: var(--tone-link, var(--color-link));
+    text-decoration: none;
+  }
+
+  .chevron-link-back:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .chevron-link-back::before {
+    content: "\2039";
+    display: inline-block;
+    transition: transform 0.25s var(--ease-apple);
+  }
+
+  .chevron-link-back:hover::before {
+    transform: translateX(-3px);
+  }
+
+  /* =====================================================================
+     ARTICLE
+     Long form prose for the newsroom reader, set on the light ground.
+     ===================================================================== */
+  .article h2 {
+    font-size: 1.75rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    margin-top: 2.75rem;
+    margin-bottom: 0.875rem;
+    color: var(--color-ink);
+  }
+
+  .article h3 {
+    font-size: 1.25rem;
+    line-height: 1.25;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.625rem;
+    color: var(--color-ink);
+  }
+
+  .article p {
+    margin-bottom: 1.35rem;
+    color: #3a3a3c;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .article ul,
+  .article ol {
+    margin: 0 0 1.35rem 1.25rem;
+    color: #3a3a3c;
+    line-height: 1.7;
+  }
+
+  .article ul {
+    list-style: disc;
+  }
+
+  .article ol {
+    list-style: decimal;
+  }
+
+  .article li {
+    margin-bottom: 0.5rem;
+  }
+
+  .article a {
+    color: var(--color-link);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-link) 35%, transparent);
+  }
+
+  .article a:hover {
+    border-bottom-color: var(--color-link);
+  }
+
+  .article strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .article code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--color-band);
+    border: 1px solid var(--color-rule-soft);
+    border-radius: 6px;
+    padding: 0.15em 0.4em;
+    color: #b3261e;
+  }
+
+  /* Code blocks stay dark even on the light page. Apple does the same in
+   * their developer documentation, and syntax is simply easier to read on a
+   * dark ground. */
+  .article pre {
+    background-color: #1d1d1f;
+    border: 1px solid #2a2a2d;
+    border-radius: 14px;
+    padding: 1.125rem 1.25rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.65;
+  }
+
+  .article pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #e4e4e7;
+  }
+
+  .article blockquote {
+    border-left: 3px solid var(--color-rule);
+    padding-left: 1.125rem;
+    margin: 0 0 1.5rem 0;
+    color: var(--color-muted);
+  }
+
+  .article hr {
+    border: 0;
+    border-top: 1px solid var(--color-rule);
+    margin: 2.5rem 0;
+  }
+
+  .article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .article th,
+  .article td {
+    text-align: left;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--color-rule-soft);
+  }
+
+  .article th {
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Respect the operating system setting. Motion's JavaScript driven animations
+ * are handled separately by MotionConfig in App.jsx, because no media query
+ * can reach an inline style written frame by frame. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

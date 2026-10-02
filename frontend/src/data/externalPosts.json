@@ -1,0 +1,35 @@
+[
+  {
+    "id": "devto-flowchart-loop",
+    "title": "I Drew My Worst Work Habit as a Flowchart. It Was a Loop.",
+    "summary": "When a project gets hard I take on more work instead of raising the problem. Drawing the habit as a flowchart showed me it was a loop with no exit.",
+    "url": "https://dev.to/keenenwilkins/week-two-i-take-over-the-work-and-i-hold-back-my-voice-1598",
+    "date": "2026-09-13",
+    "readingMinutes": 7,
+    "category": "Field notes",
+    "source": "dev.to",
+    "tags": ["career", "devjournal"]
+  },
+  {
+    "id": "devto-flow-logs",
+    "title": "I Put a Database on the Public Internet. My Flow Logs Knew Before I Did.",
+    "summary": "A Terraform provisioned VPC, a PostgreSQL instance deliberately exposed, and what the flow logs recorded before I noticed anything was wrong.",
+    "url": "https://dev.to/keenenwilkins/i-put-a-database-on-the-public-internet-my-flow-logs-knew-before-i-did-510k",
+    "date": "2026-09-08",
+    "readingMinutes": 5,
+    "category": "Engineering",
+    "source": "dev.to",
+    "tags": ["aws", "terraform", "security", "devops"]
+  },
+  {
+    "id": "devto-week-one",
+    "title": "The Tea on Teamwork: Week One of My i.c.stars Tech Internship",
+    "summary": "Week one went in expecting technology and systems. It turned out to be about the people on the team.",
+    "url": "https://dev.to/keenenwilkins/the-tea-on-teamwork-week-one-of-my-icstars-tech-internship-k3o",
+    "date": "2026-09-05",
+    "readingMinutes": 3,
+    "category": "Field notes",
+    "source": "dev.to",
+    "tags": ["career", "devjournal"]
+  }
+]

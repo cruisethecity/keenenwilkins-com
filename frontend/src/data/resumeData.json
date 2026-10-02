@@ -1,0 +1,459 @@
+{
+  "meta": {
+    "name": "Keenen Wilkins",
+    "initials": "KW",
+    "discipline": "Cloud Architecture and DevSecOps",
+    "location": "Kansas City, Missouri",
+    "availability": "Available 2026",
+    "resumePath": "/resume/keenen-wilkins-resume.pdf",
+    "links": {
+      "github": "https://github.com/cruisethecity",
+      "linkedin": "https://www.linkedin.com/in/keenenw",
+      "email": "keenenwilkins@gmail.com",
+      "phone": "***REMOVED***"
+    }
+  },
+  "nav": [
+    {
+      "id": "overview",
+      "label": "Overview"
+    },
+    {
+      "id": "work",
+      "label": "Work"
+    },
+    {
+      "id": "specs",
+      "label": "Specs"
+    },
+    {
+      "id": "experience",
+      "label": "Experience"
+    },
+    {
+      "id": "credentials",
+      "label": "Credentials"
+    },
+    {
+      "id": "newsroom",
+      "label": "Newsroom"
+    }
+  ],
+  "hero": {
+    "eyebrow": "Keenen Wilkins",
+    "headline": [
+      "Forged in operations.",
+      "Engineered for the cloud."
+    ],
+    "subheadline": "AWS Certified Solutions Architect. Built to withstand production traffic. Available 2026.",
+    "footnote": "Every resource behind this page was provisioned by Terraform and deployed by a pipeline that holds no AWS keys."
+  },
+  "highlights": [
+    {
+      "id": "certifications",
+      "value": "5",
+      "unit": "",
+      "label": "certifications earned",
+      "detail": "AWS Solutions Architect Associate, AWS Cloud Practitioner, Linux Essentials, Oracle Cloud Foundations, Google IT Support.",
+      "icon": "Award"
+    },
+    {
+      "id": "capture",
+      "value": "77,959",
+      "unit": "",
+      "label": "events ingested from a live honeypot",
+      "detail": "A deliberately exposed host inside a locked down VPC streamed unsolicited internet traffic into Splunk. The attacker addresses in those dashboards are organic, not simulated.",
+      "icon": "Radar"
+    },
+    {
+      "id": "iac",
+      "value": "100",
+      "unit": "%",
+      "label": "of this stack is code",
+      "detail": "No console clicks. Every bucket, role, function, table and DNS record lives in a Terraform module.",
+      "icon": "FileCode"
+    },
+    {
+      "id": "keys",
+      "value": "0",
+      "unit": "",
+      "label": "long lived keys in CI",
+      "detail": "GitHub authenticates to AWS over OpenID Connect. The credentials expire in one hour and are never stored.",
+      "icon": "KeyRound"
+    }
+  ],
+  "projects": [
+    {
+      "id": "threat-pipeline",
+      "eyebrow": "Detection and response",
+      "title": "Enterprise DevSecOps Threat Pipeline",
+      "summary": "Splunk ingests VPC Flow Logs and CloudTrail, correlation searches mapped to MITRE ATT&CK raise the alert, and a Python Lambda drops a deny rule into the network ACL before a human has read the notification.",
+      "detail": "I own every piece of AWS infrastructure and all of the Terraform. Kenny Barr owns the Splunk detection engineering and the dashboard work.",
+      "metrics": [
+        {
+          "value": "T1110, T1071",
+          "label": "ATT&CK techniques"
+        },
+        {
+          "value": "Under 60s",
+          "label": "alert to containment"
+        },
+        {
+          "value": "5 panels",
+          "label": "SOC dashboard"
+        }
+      ],
+      "stack": [
+        "Splunk",
+        "SPL",
+        "AWS Lambda",
+        "Python",
+        "Network ACL",
+        "CloudTrail",
+        "VPC Flow Logs",
+        "Terraform"
+      ],
+      "status": "Phase 2 shipped",
+      "accent": "signal",
+      "icon": "Radar",
+      "media": {
+        "stem": "threat-pipeline",
+        "widths": [
+          800,
+          1600
+        ],
+        "fallbackWidth": 1600,
+        "intrinsic": {
+          "width": 1891,
+          "height": 872
+        },
+        "alt": "Splunk dashboard titled Phase 1 Cryptojacking Detection. An endpoint malware event mapped to MITRE technique T1496 with high severity, an attack timeline broken out by source address, port sweep activity, a threat correlation summary, and a table of the top attacking addresses with their connection counts and targeted ports."
+      },
+      "repo": "https://github.com/cruisethecity/aws-devsecops-threat-pipeline",
+      "feature": true
+    },
+    {
+      "id": "secureaccess",
+      "eyebrow": "Security tooling",
+      "title": "SecureAccess Audit Dashboard",
+      "summary": "Parses raw access logs in the browser and scores every session against several risk signals at once, so a reviewer opens the three accounts worth investigating instead of scrolling ten thousand rows.",
+      "metrics": [
+        {
+          "value": "Multi signal",
+          "label": "threat scoring"
+        },
+        {
+          "value": "Zero backend",
+          "label": "runs client side"
+        }
+      ],
+      "stack": [
+        "JavaScript",
+        "JSON log parsing",
+        "Risk heuristics"
+      ],
+      "status": "Shipped",
+      "accent": "glow",
+      "icon": "ShieldCheck",
+      "repo": "https://github.com/cruisethecity/SecureAccess-Audit-Dashboard",
+      "media": {
+        "stem": "secureaccess",
+        "widths": [
+          760,
+          1520
+        ],
+        "fallbackWidth": 1520,
+        "intrinsic": {
+          "width": 1905,
+          "height": 1036
+        },
+        "alt": "The SecureAccess Audit Dashboard. Four summary tiles reading 44 total events, 17 failed logins, 5 flagged accounts and a highest risk user, a row of filter tabs for failed logins, after hours activity, privilege escalation and suspicious only, and a table of access events with usernames, actions, addresses, departments, status and a threat score per row."
+      }
+    },
+    {
+      "id": "honeypot",
+      "eyebrow": "Live threat research",
+      "title": "AWS Incident Response Honeypot",
+      "summary": "A deliberately exposed host inside a locked down VPC, provisioned by Terraform, that streamed unsolicited attack traffic into Splunk. The threat actor data in these dashboards is organic, not simulated.",
+      "metrics": [
+        {
+          "value": "Real traffic",
+          "label": "no synthetic data"
+        }
+      ],
+      "stack": [
+        "Terraform",
+        "AWS VPC",
+        "Splunk",
+        "Incident response"
+      ],
+      "status": "Capture complete",
+      "accent": "amber",
+      "icon": "Activity",
+      "media": {
+        "stem": "honeypot-intel",
+        "widths": [
+          700,
+          1400
+        ],
+        "fallbackWidth": 1400,
+        "intrinsic": {
+          "width": 934,
+          "height": 512
+        },
+        "alt": "Splunk panel showing an automation KPI of 77,959 events, beside a statistics table of attacking source addresses with connection counts and the most recent port each one targeted."
+      },
+      "repo": "https://github.com/cruisethecity/aws-incident-response-honeypot"
+    },
+    {
+      "id": "cloud-resume",
+      "eyebrow": "This page",
+      "title": "Serverless Resume Platform",
+      "summary": "React on a private S3 bucket behind CloudFront, a Python Lambda counting visits in DynamoDB, and a pipeline that plans before a human approves the apply.",
+      "metrics": [
+        {
+          "value": "Keyless",
+          "label": "OIDC deploys"
+        }
+      ],
+      "stack": [
+        "React",
+        "Terraform",
+        "Lambda",
+        "DynamoDB",
+        "GitHub Actions"
+      ],
+      "status": "Live",
+      "accent": "glow",
+      "icon": "Cloud"
+    },
+    {
+      "id": "logvault",
+      "eyebrow": "Linux automation",
+      "title": "RHEL LogVault Automation",
+      "summary": "Scheduled shell and systemd automation that collects, compresses and ships RHEL 9 journal data with integrity checks, so a rotated log cannot be quietly altered.",
+      "metrics": [
+        {
+          "value": "RHEL 9",
+          "label": "hardened target"
+        }
+      ],
+      "stack": [
+        "Bash",
+        "systemd",
+        "journald",
+        "RHEL 9"
+      ],
+      "status": "Shipped",
+      "accent": "violet",
+      "icon": "Server",
+      "repo": "https://github.com/cruisethecity/AWS-RHEL-LogVault-Automation"
+    }
+  ],
+  "specs": [
+    {
+      "group": "Cloud platforms",
+      "items": [
+        "AWS: EC2, VPC, S3, IAM, Lambda, DynamoDB, CloudFront, Route53, API Gateway, CloudWatch, WAF",
+        "Oracle Cloud Infrastructure fundamentals",
+        "Cost aware architecture and on demand capacity choices"
+      ]
+    },
+    {
+      "group": "Infrastructure as code",
+      "items": [
+        "Terraform, written as reusable modules with typed variables and validation",
+        "Remote state in S3 with DynamoDB locking",
+        "Plan review discipline. Nothing reaches production without a readable diff"
+      ]
+    },
+    {
+      "group": "Security operations",
+      "items": [
+        "Splunk SPL, CIM normalization, correlation searches",
+        "MITRE ATT&CK technique mapping",
+        "CloudTrail and VPC Flow Log analysis",
+        "Automated containment with Lambda and network ACLs"
+      ]
+    },
+    {
+      "group": "Languages",
+      "items": [
+        "Python",
+        "Bash",
+        "JavaScript",
+        "SQL",
+        "HCL"
+      ]
+    },
+    {
+      "group": "Linux administration",
+      "items": [
+        "RHEL 9 daily driver",
+        "systemd units and timers, journald",
+        "Users, groups, permissions, sudo policy",
+        "Baseline hardening and log integrity"
+      ]
+    },
+    {
+      "group": "Delivery and automation",
+      "items": [
+        "GitHub Actions with OpenID Connect federation",
+        "pytest and moto for AWS unit tests",
+        "Least privilege deploy roles, separated for plan and apply",
+        "Cache invalidation and immutable asset strategy"
+      ]
+    },
+    {
+      "group": "Frontend",
+      "items": [
+        "React and Vite",
+        "Tailwind CSS design systems",
+        "Motion design with Framer Motion",
+        "Accessible, keyboard navigable markup"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "id": "icstars",
+      "company": "i.c.stars",
+      "role": "Technology Intern, Cycle 7",
+      "dateRange": "August 2026 to now",
+      "location": "Kansas City, Missouri",
+      "summary": "Becoming Technologists, a residency where project teams run a simulated consulting firm through design sprints for a real client.",
+      "bullets": [
+        "Working a live client engagement on a three person project team through consecutive design sprints, in a program that normally staffs a team at four to five.",
+        "Publishing a weekly build log of the cycle on dev.to under the series name i.c.stars Cycle 7. Week one is in the newsroom below.",
+        "Serving as the cohort documentarian for the guest speaker series, writing recap one pagers and publishing them to the program SharePoint."
+      ]
+    },
+    {
+      "id": "transition",
+      "company": "Self directed engineering",
+      "role": "Cloud and Security Build Out",
+      "dateRange": "August 2024 to now",
+      "location": "Nights and weekends",
+      "summary": "Turned the transition into a build log instead of a study plan.",
+      "bullets": [
+        "Provisioned live AWS environments with Terraform, then broke them on purpose and fixed them.",
+        "Ran RHEL 9 as a daily administration target rather than a lab exercise.",
+        "Shipped a Splunk detection pipeline with automated AWS containment alongside a detection engineer."
+      ]
+    },
+    {
+      "id": "sazerac",
+      "company": "Sazerac",
+      "role": "Market Development Representative",
+      "dateRange": "July 2022 to August 2024",
+      "location": "Kansas City, Missouri",
+      "summary": "Owned a territory of 55 to 60 B2B accounts against quarterly volume targets.",
+      "bullets": [
+        "Ran the entire cycle without a handoff. Prospecting, pricing conversations, merchandising resets, and the follow up that actually closes.",
+        "Turned messy field data into forecasts leadership planned around, which is the same job as building a dashboard someone is willing to trust.",
+        "Held the line on compliance in a heavily regulated category, where a shortcut is a legal problem, not a style choice."
+      ]
+    },
+    {
+      "id": "zumiez",
+      "company": "Zumiez",
+      "role": "Second Assistant Manager",
+      "dateRange": "December 2013 to December 2021",
+      "location": "Multiple locations",
+      "summary": "Eight years of floor operations, scheduling, inventory accuracy and peak season throughput.",
+      "bullets": [
+        "Managed daily operations through eight consecutive peak seasons, where the plan meets reality at nine in the morning and you adjust or you lose the day.",
+        "Trained and coached new hires, including the ones other leads passed on.",
+        "Owned cash controls and loss prevention, which is where I learned that an audit trail is worth exactly as much as its weakest control."
+      ]
+    }
+  ],
+  "credentials": {
+    "certifications": [
+      {
+        "name": "AWS Certified Solutions Architect, Associate",
+        "issuer": "Amazon Web Services",
+        "status": "Earned",
+        "icon": "Cloud"
+      },
+      {
+        "name": "AWS Certified Cloud Practitioner",
+        "issuer": "Amazon Web Services",
+        "status": "Earned",
+        "icon": "Cloud"
+      },
+      {
+        "name": "Linux Essentials, LPI 010",
+        "issuer": "Linux Professional Institute",
+        "status": "Earned",
+        "icon": "Terminal"
+      },
+      {
+        "name": "Oracle Cloud Infrastructure Foundations Associate",
+        "issuer": "Oracle",
+        "status": "Earned",
+        "icon": "Database"
+      },
+      {
+        "name": "Google IT Support Professional",
+        "issuer": "Google",
+        "status": "Earned",
+        "icon": "Cpu"
+      },
+      {
+        "name": "HashiCorp Certified Terraform Associate",
+        "issuer": "HashiCorp",
+        "status": "In progress",
+        "icon": "FileCode"
+      }
+    ],
+    "education": [
+      {
+        "institution": "Western Governors University",
+        "credential": "B.S. Cloud Computing, AWS track",
+        "status": "In progress",
+        "icon": "GraduationCap"
+      }
+    ]
+  },
+  "contact": {
+    "headline": "Let us build something that stays up.",
+    "subheadline": "Open to cloud engineering, platform and DevSecOps roles. Remote or Kansas City.",
+    "cards": [
+      {
+        "id": "email",
+        "label": "Email",
+        "value": "keenenwilkins@gmail.com",
+        "href": "mailto:keenenwilkins@gmail.com",
+        "icon": "Mail"
+      },
+      {
+        "id": "linkedin",
+        "label": "LinkedIn",
+        "value": "linkedin.com/in/keenenw",
+        "href": "https://www.linkedin.com/in/keenenw",
+        "icon": "Linkedin"
+      },
+      {
+        "id": "github",
+        "label": "GitHub",
+        "value": "github.com/cruisethecity",
+        "href": "https://github.com/cruisethecity",
+        "icon": "Github"
+      }
+    ],
+    "portrait": {
+      "stem": "headshot",
+      "widths": [
+        170,
+        340
+      ],
+      "fallbackWidth": 170,
+      "intrinsic": {
+        "width": 170,
+        "height": 170
+      },
+      "alt": "Keenen Wilkins."
+    }
+  }
+}

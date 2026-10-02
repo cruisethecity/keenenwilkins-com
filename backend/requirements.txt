@@ -1,0 +1,6 @@
+# Runtime dependencies for the Lambda package.
+#
+# boto3 and botocore ship inside the managed python3.11 runtime, so shipping
+# them in the deployment zip would only bloat the artifact and pin you to an
+# older SDK than the one AWS already patches for you. This file stays empty on
+# purpose. Add a line here only when you need a library the runtime lacks.

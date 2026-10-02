@@ -1,0 +1,47 @@
+# dependencies and build output
+node_modules/
+dist/
+.vite/
+coverage/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl.bak
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# build artifacts produced by terraform
+terraform/**/.build/
+terraform/**/lambda_build/
+*.zip
+
+# partial backend config, contains the account scoped bucket name
+backend.hcl
+
+# local environment
+.env
+.env.local
+.env.*.local
+.DS_Store
+.idea/
+.vscode/
