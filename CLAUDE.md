@@ -31,7 +31,17 @@ Read this before assuming anything works.
 
 ## Commands
 
-Three gates. Run all three before claiming anything is done.
+One command runs every gate and prints a pass/fail summary:
+
+```bash
+./scripts/verify.sh            # everything
+./scripts/verify.sh --quick    # skip npm ci and terraform init
+```
+
+It also checks the toolchain against the CI pins, which is how the Terraform
+state mismatch below gets caught before it reaches a pipeline.
+
+The individual gates, if you need to run one on its own:
 
 ```bash
 # frontend
