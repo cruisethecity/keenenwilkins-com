@@ -1,6 +1,6 @@
 # Backlog
 
-Last updated 2 October 2026.
+Last updated 2 October 2026. L1 pushed.
 
 ## Definition of done
 
@@ -54,7 +54,7 @@ cloud session credit sitting on the account expires 5 November unused.
 
 | ID | Item | Acceptance criterion | Status |
 |---|---|---|---|
-| L1 | Put the repo in git and push to GitHub, public. **Gates everything, including cloud sessions** | `git log` shows a commit, `github.com/cruisethecity/keenenwilkins-com` returns 200, and `git status` shows no `.tfvars`, `backend.hcl` or `tfstate` tracked | open |
+| L1 | ~~Push to GitHub~~ Pushed 2 Oct as `fbcd013`, 107 files. **Still private, needs to be public** | Repo loads logged out, which it does not yet | blocked on visibility |
 | L2 | New AWS account on the **Paid plan** | `aws sts get-caller-identity` returns the new account id, console shows Paid plan, and a CloudWatch billing alarm exists at $5 | open |
 | L3 | Terraform proves out (see M1, M2) | Both roots pass `terraform validate` | open |
 | L4 | Bootstrap remote state | `terraform output backend_config_snippet` prints, and `backend.hcl` exists with those values | blocked by L3 |
@@ -83,6 +83,8 @@ stops thinking about them.
 | M9 | No file in `public/media/` is unreferenced by `resumeData.json`. **Currently fails:** `s3-monitoring-800.webp`, `s3-monitoring-1600.webp` and `s3-monitoring-1600.png` are orphaned, pending F3 | open |
 | M10 | No hyphen appears in any reader visible string in `resumeData.json`, any component string, any `alt` text, or `src/content/posts/*.md`. Scriptable, and worth scripting because this rule breaks silently | open |
 | M11 | The counter endpoint returns a JSON integer that is larger on a second call | blocked by L5 |
+| M13 | `README.md` still describes the pre rebuild site: titled "Apple styled Cloud Resume", calls ProLineup a bento grid, describes GlassHeader as a single `bg-black/75` bar, and omits `FeatureBand.jsx`, `lib/posts.js`, `data/externalPosts.json`, `scripts/sync-devto.mjs`, `scripts/apple-audit.mjs`, `CLAUDE.md` and `BACKLOG.md` | open |
+| M14 | The repo has no description and no topics on GitHub. The name no longer says what the stack is, so the description has to | open |
 | M12 | ~~Delete the empty `scripts/` directory~~ It now holds `apple-audit.mjs` | done |
 
 ---
