@@ -25,9 +25,10 @@ from __future__ import annotations
 import json
 import logging
 import os
-from datetime import datetime, timezone
+from collections.abc import Mapping
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Mapping
+from typing import Any
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
@@ -134,7 +135,7 @@ def _respond(
 
 
 def _increment(counter_id: str) -> int:
-    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now = datetime.now(UTC).isoformat(timespec="seconds")
     result = _table().update_item(
         Key={"counter_id": counter_id},
         UpdateExpression="ADD visit_count :one SET last_seen_at = :now",
