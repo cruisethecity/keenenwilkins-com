@@ -53,7 +53,16 @@ Other scripts: `npm run dev` (vite, port 5173), `npm run preview` (port 4173),
 diffs them against the `@theme` tokens, writing `docs/apple-audit.md`. Needs
 playwright and a network that allows apple.com. See BACKLOG.md J3.
 
-Pinned versions, from the workflows: Node 20, Python 3.11, Terraform 1.13.3.
+Pinned versions, from the workflows: Node 20, Python 3.11, Terraform 1.15.8.
+
+**The Terraform pin must be >= whatever runs the first local apply.** Terraform
+stamps the state file with the version that wrote it and refuses to read state
+written by a newer one. Applying locally on 1.15.8 against a CI pinned to 1.13.3
+fails every later pipeline run with "state snapshot was created by a newer
+version". Bump both together or not at all.
+
+Local Python must be 3.11 or newer. macOS ships 3.9, which cannot install this
+project, so use a homebrew python and a venv in `backend/.venv` (gitignored).
 
 ---
 

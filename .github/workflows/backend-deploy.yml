@@ -46,7 +46,7 @@ permissions:
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
   PYTHON_VERSION: "3.11"
-  TERRAFORM_VERSION: "1.13.3"
+  TERRAFORM_VERSION: "1.15.8"
   TF_WORKING_DIR: terraform/environments/prod
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
