@@ -18,16 +18,28 @@
 locals {
   github_issuer = "token.actions.githubusercontent.com"
 
-  # Every subject claim that is allowed to assume a role in this account.
-  # A subject looks like repo:owner/name:ref:refs/heads/main or
-  # repo:owner/name:environment:production. Pinning it is the whole point.
-  # A trust policy with sub set to repo:owner/name:* would let a pull request
-  # from a fork assume the role.
-  allowed_subjects = concat(
-    [for branch in var.allowed_branches : "repo:${var.github_repository}:ref:refs/heads/${branch}"],
-    [for environment in var.allowed_environments : "repo:${var.github_repository}:environment:${environment}"],
-    var.additional_subjects,
-  )
+  # A subject claim looks like repo:owner/name:ref:refs/heads/main,
+  # repo:owner/name:environment:production or repo:owner/name:pull_request.
+  # Pinning it is the whole point. A trust policy with sub set to
+  # repo:owner/name:* would trust anything the repository can produce.
+  branch_subjects      = [for branch in var.allowed_branches : "repo:${var.github_repository}:ref:refs/heads/${branch}"]
+  environment_subjects = [for environment in var.allowed_environments : "repo:${var.github_repository}:environment:${environment}"]
+  pull_request_subject = ["repo:${var.github_repository}:pull_request"]
+
+  # Each role trusts only the subjects its own job actually presents, so the
+  # separation is enforced by IAM rather than by the workflow file continuing
+  # to declare the right environment key.
+  #
+  #   frontend  pushes to main, no environment     branch subjects only
+  #   plan      pushes to main and pull requests   branch plus pull_request
+  #   apply     only the gated environment job     environment subjects only
+  #
+  # A fork cannot reach the plan role even though pull_request is trusted.
+  # GitHub withholds id-token write permission from fork triggered runs, so
+  # no OIDC token is ever minted for one.
+  frontend_subjects = concat(local.branch_subjects, var.additional_subjects)
+  plan_subjects     = concat(local.branch_subjects, local.pull_request_subject, var.additional_subjects)
+  apply_subjects    = concat(local.environment_subjects, var.additional_subjects)
 
   state_bucket_arn = "arn:aws:s3:::${var.state_bucket_name}"
 }
@@ -67,7 +79,13 @@ locals {
 
 # ------------------------------------------------------------- trust document
 
-data "aws_iam_policy_document" "assume_with_oidc" {
+data "aws_iam_policy_document" "assume" {
+  for_each = {
+    frontend = local.frontend_subjects
+    plan     = local.plan_subjects
+    apply    = local.apply_subjects
+  }
+
   statement {
     sid     = "GitHubActionsWebIdentity"
     effect  = "Allow"
@@ -87,7 +105,7 @@ data "aws_iam_policy_document" "assume_with_oidc" {
     condition {
       test     = "StringLike"
       variable = "${local.github_issuer}:sub"
-      values   = local.allowed_subjects
+      values   = each.value
     }
   }
 }
@@ -133,7 +151,7 @@ data "aws_iam_policy_document" "deploy_frontend" {
 resource "aws_iam_role" "deploy_frontend" {
   name                 = "${var.name_prefix}-gha-frontend-deploy"
   description          = "Assumed by the frontend workflow to sync the bundle and invalidate the cache."
-  assume_role_policy   = data.aws_iam_policy_document.assume_with_oidc.json
+  assume_role_policy   = data.aws_iam_policy_document.assume["frontend"].json
   max_session_duration = 3600
   tags                 = var.tags
 }
@@ -192,7 +210,7 @@ data "aws_iam_policy_document" "terraform_state" {
 resource "aws_iam_role" "plan_backend" {
   name                 = "${var.name_prefix}-gha-backend-plan"
   description          = "Read only role used by terraform plan on every push."
-  assume_role_policy   = data.aws_iam_policy_document.assume_with_oidc.json
+  assume_role_policy   = data.aws_iam_policy_document.assume["plan"].json
   max_session_duration = 3600
   tags                 = var.tags
 }
@@ -374,7 +392,7 @@ data "aws_iam_policy_document" "apply_backend" {
 resource "aws_iam_role" "apply_backend" {
   name                 = "${var.name_prefix}-gha-backend-apply"
   description          = "Assumed only after a human approves the production environment gate."
-  assume_role_policy   = data.aws_iam_policy_document.assume_with_oidc.json
+  assume_role_policy   = data.aws_iam_policy_document.assume["apply"].json
   max_session_duration = 3600
   tags                 = var.tags
 }

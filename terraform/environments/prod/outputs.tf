@@ -74,6 +74,7 @@ output "repository_variables" {
     S3_BUCKET                  = module.static_site.bucket_name
     CLOUDFRONT_DISTRIBUTION_ID = module.static_site.distribution_id
     VITE_API_BASE_URL          = module.lambda_api.api_endpoint
+    VITE_SITE_URL              = module.static_site.site_url
     TF_STATE_BUCKET            = var.state_bucket_name
     TF_LOCK_TABLE              = var.state_lock_table_name
   }

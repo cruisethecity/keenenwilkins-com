@@ -19,6 +19,11 @@ output "backend_apply_role_arn" {
 }
 
 output "allowed_subjects" {
-  description = "OIDC subject claims trusted by these roles. Useful when debugging a 403 on assume role."
-  value       = local.allowed_subjects
+  description = "OIDC subject claims trusted by each role. Useful when debugging a 403 on assume role."
+
+  value = {
+    frontend = local.frontend_subjects
+    plan     = local.plan_subjects
+    apply    = local.apply_subjects
+  }
 }
