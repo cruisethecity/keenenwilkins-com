@@ -65,6 +65,10 @@ gh variable set TF_LOCK_TABLE              --repo $REPO --body "cloud-resume-tf-
 gh variable list --repo $REPO   # expect ten rows
 ```
 
+`gh` is not installed on this Mac as of 10 October. Run
+`brew install gh && gh auth login` first or every line above fails with
+`command not found`.
+
 None of those ten are credentials, so a shell prompt is a fine place for them.
 `VITE_SITE_URL` is not in the `repository_variables` output yet, see M16, which
 is why it is written out by hand above.
