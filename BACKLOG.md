@@ -1,14 +1,101 @@
 # Backlog
 
-Last updated 2 October 2026. L1 pushed.
+Last updated 10 October 2026. L5 done, infrastructure is live. Resume at L6.
 
 ## Definition of done
 
 The site is live at a URL, every claim on it is true, and a stranger can verify
 the top three claims in under five minutes.
 
-All three currently fail. Nothing is deployed, several claims are unverified,
-and there is nothing for a stranger to check.
+One of three now passes. The infrastructure is deployed and there is a URL,
+but the bucket behind it is empty, so the URL serves a 403 and there is still
+nothing for a stranger to read. Several claims remain unverified.
+
+---
+
+## Resume here
+
+**State as of 10 October 2026.** Infrastructure is live. The site is not.
+
+| | |
+|---|---|
+| Site URL | `https://dqviqcoub6ym4.cloudfront.net` returns 403 until L7, because the bucket is empty |
+| API | `https://csx0oz2840.execute-api.us-east-1.amazonaws.com/visits` |
+| Distribution | `E22SRI686ERPFP` |
+| Site bucket | `cloud-resume-site-556071986480` |
+| Remote state | `s3://cloud-resume-tfstate-556071986480/prod/terraform.tfstate` |
+| Apply result | 34 added, 0 changed, 0 destroyed, 0 errors |
+
+### Idle cost is $0.00 per month
+
+Verified against the code, not assumed. Both DynamoDB tables are
+`PAY_PER_REQUEST`, so they bill nothing without requests. Lambda and API
+Gateway bill per invocation and there are none. The two CloudWatch alarms sit
+inside the always free allowance of ten. The site bucket is empty. There is no
+ACM certificate and no Route 53 hosted zone, because `enable_custom_domain`
+is `false`. Nothing accrues while this sits idle.
+
+### First command tomorrow
+
+```bash
+aws sts get-caller-identity
+```
+
+The Identity Center session is deliberately short lived. If that returns the
+`AWSReservedSSO_AdministratorAccess` ARN, the session is still good. If it says
+the token expired, run `aws sso login` and approve in the browser. An expired
+token is short lived credentials working as designed, not a broken setup.
+
+### Then do L6, wire GitHub
+
+```bash
+REPO=cruisethecity/keenenwilkins-com
+
+gh variable set AWS_REGION                 --repo $REPO --body "us-east-1"
+gh variable set AWS_FRONTEND_ROLE_ARN      --repo $REPO --body "arn:aws:iam::556071986480:role/cloud-resume-gha-frontend-deploy"
+gh variable set AWS_PLAN_ROLE_ARN          --repo $REPO --body "arn:aws:iam::556071986480:role/cloud-resume-gha-backend-plan"
+gh variable set AWS_APPLY_ROLE_ARN         --repo $REPO --body "arn:aws:iam::556071986480:role/cloud-resume-gha-backend-apply"
+gh variable set S3_BUCKET                  --repo $REPO --body "cloud-resume-site-556071986480"
+gh variable set CLOUDFRONT_DISTRIBUTION_ID --repo $REPO --body "E22SRI686ERPFP"
+gh variable set VITE_API_BASE_URL          --repo $REPO --body "https://csx0oz2840.execute-api.us-east-1.amazonaws.com"
+gh variable set VITE_SITE_URL              --repo $REPO --body "https://dqviqcoub6ym4.cloudfront.net"
+gh variable set TF_STATE_BUCKET            --repo $REPO --body "cloud-resume-tfstate-556071986480"
+gh variable set TF_LOCK_TABLE              --repo $REPO --body "cloud-resume-tf-locks"
+
+gh variable list --repo $REPO   # expect ten rows
+```
+
+None of those ten are credentials, so a shell prompt is a fine place for them.
+`VITE_SITE_URL` is not in the `repository_variables` output yet, see M16, which
+is why it is written out by hand above.
+
+Then the approval gate:
+
+```bash
+MY_ID=$(gh api user --jq .id)
+gh api -X PUT "repos/$REPO/environments/production" --input - <<JSON
+{
+  "wait_timer": 0,
+  "prevent_self_review": false,
+  "reviewers": [{"type": "User", "id": $MY_ID}],
+  "deployment_branch_policy": null
+}
+JSON
+```
+
+`prevent_self_review` must stay `false`. KJ is the only reviewer, so turning it
+on means nobody is ever permitted to approve a deploy and the apply job blocks
+forever. A 422 about protection rules means required reviewers need a paid
+GitHub plan on a private repo. The environment is still created and the
+pipeline still runs, the gate just is not enforced until the repo is public.
+
+Then L7, trigger the first deploy. The tree is clean, so dispatch it rather
+than faking an empty commit:
+
+```bash
+gh workflow run frontend-deploy.yml --repo $REPO --ref main
+gh run watch --repo $REPO
+```
 
 ---
 
@@ -48,18 +135,20 @@ answer from KJ.
 
 In dependency order. Full detail and per step cost in the launch runbook.
 
-**L1 is the real bottleneck.** A Claude Code cloud session clones from GitHub,
-so until the repo is pushed there are no cloud sessions to run, and the $100
-cloud session credit sitting on the account expires 5 November unused.
+**L1 is the remaining bottleneck**, now only its visibility half. The repo is
+pushed but still private, so no stranger can verify a single claim the site
+makes, and the required reviewer gate in L6 cannot be enforced on a private
+repo without a paid GitHub plan. The $100 cloud session credit expires
+5 November.
 
 | ID | Item | Acceptance criterion | Status |
 |---|---|---|---|
 | L1 | ~~Push to GitHub~~ Pushed 2 Oct as `fbcd013`, 107 files. **Still private, needs to be public** | Repo loads logged out, which it does not yet | blocked on visibility |
-| L2 | New AWS account on the **Paid plan** | `aws sts get-caller-identity` returns the new account id, console shows Paid plan, and a CloudWatch billing alarm exists at $5 | open |
-| L3 | Terraform proves out (see M1, M2) | Both roots pass `terraform validate` | open |
-| L4 | Bootstrap remote state | `terraform output backend_config_snippet` prints, and `backend.hcl` exists with those values | blocked by L3 |
-| L5 | First apply, local, `enable_custom_domain = false` | `terraform output site_url` returns a CloudFront hostname that serves the page over HTTPS | blocked by L4 |
-| L6 | Wire GitHub | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | blocked by L5 |
+| L2 | ~~New AWS account~~ Done 9 Oct. Access is IAM Identity Center with short lived credentials, no IAM users and no access keys anywhere | `aws sts get-caller-identity` returns `AWSReservedSSO_AdministratorAccess_.../Kj-Admin` in account `556071986480` | done, except the $5 billing alarm |
+| L3 | ~~Terraform proves out~~ Done 9 Oct, `scripts/verify.sh` green on every gate | Both roots pass `terraform validate` | done |
+| L4 | ~~Bootstrap remote state~~ Done 10 Oct | `backend.hcl` exists and `terraform init` reports the s3 backend at `prod/terraform.tfstate` | done |
+| L5 | ~~First apply, local, `enable_custom_domain = false`~~ Done 10 Oct | `terraform output site_url` returns `https://dqviqcoub6ym4.cloudfront.net` | done. Serves 403, not the page, because L7 has not run |
+| L6 | Wire GitHub. Commands are in **Resume here** above | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | **next** |
 | L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | blocked by L6 |
 | L8 | Custom domain. Optional, last | Domain resolves over HTTPS with a valid ACM certificate and `www` redirects to apex | open |
 
@@ -72,8 +161,8 @@ stops thinking about them.
 
 | ID | Criterion | Status |
 |---|---|---|
-| M1 | `terraform validate` exits 0 in `terraform/bootstrap` and `terraform/environments/prod`. **Has never run.** | open |
-| M2 | `terraform fmt -check -recursive terraform` exits 0 | open |
+| M1 | `terraform validate` exits 0 in `terraform/bootstrap` and `terraform/environments/prod` | passing as of 9 Oct |
+| M2 | `terraform fmt -check -recursive terraform` exits 0 | passing as of 9 Oct |
 | M3 | `pytest` passes 18 of 18 in `backend/` | passing as of 14 Sep |
 | M4 | `npm run lint` exits 0 and `npm run build` succeeds | passing as of 14 Sep |
 | M5 | `document.documentElement.scrollWidth - clientWidth === 0` at 390px and 1440px, after scrolling the full page | passing as of 14 Sep |
@@ -82,7 +171,9 @@ stops thinking about them.
 | M8 | Every `media.stem` in `resumeData.json` has matching `.webp` and `.png` files at every declared width in `public/media/` | open |
 | M9 | No file in `public/media/` is unreferenced by `resumeData.json`. **Currently fails:** `s3-monitoring-800.webp`, `s3-monitoring-1600.webp` and `s3-monitoring-1600.png` are orphaned, pending F3 | open |
 | M10 | No hyphen appears in any reader visible string in `resumeData.json`, any component string, any `alt` text, or `src/content/posts/*.md`. Scriptable, and worth scripting because this rule breaks silently | open |
-| M11 | The counter endpoint returns a JSON integer that is larger on a second call | blocked by L5 |
+| M11 | The counter endpoint returns a JSON integer that is larger on a second call | open, L5 done so this is now testable |
+| M15 | The backend workflow runs `plan` on `pull_request`, but the OIDC trust policy allows only `ref:refs/heads/main` and `environment:production`. A pull request token carries `sub=repo:owner/name:pull_request`, which matches neither, so STS refuses and the plan job fails on every PR. Pushes to `main` are unaffected. Fix by adding the `pull_request` subject to `additional_subjects`, noting a fork PR cannot reach it anyway because GitHub withholds `id-token: write` from fork workflows | open |
+| M16 | `output "repository_variables"` emits nine of the ten variables the workflows read. `VITE_SITE_URL` is missing, and the only step that reads it, the live site check at the end of the frontend deploy, is written to skip itself silently when it is empty. So a missing value turns off the one check that proves the deploy worked. Add it to the output, and drop the dead `VITE_SITE_URL` injection at `frontend-deploy.yml` line 68, which nothing in `frontend/src` reads | open |
 | M13 | `README.md` still describes the pre rebuild site: titled "Apple styled Cloud Resume", calls ProLineup a bento grid, describes GlassHeader as a single `bg-black/75` bar, and omits `FeatureBand.jsx`, `lib/posts.js`, `data/externalPosts.json`, `scripts/sync-devto.mjs`, `scripts/apple-audit.mjs`, `CLAUDE.md` and `BACKLOG.md` | open |
 | M14 | The repo has no description and no topics on GitHub. The name no longer says what the stack is, so the description has to | open |
 | M12 | ~~Delete the empty `scripts/` directory~~ It now holds `apple-audit.mjs` | done |
