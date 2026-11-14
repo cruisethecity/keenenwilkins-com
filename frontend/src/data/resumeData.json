@@ -9,8 +9,7 @@
     "links": {
       "github": "https://github.com/cruisethecity",
       "linkedin": "https://www.linkedin.com/in/keenenw",
-      "email": "keenenwilkins@gmail.com",
-      "phone": "***REMOVED***"
+      "email": "keenenwilkins@gmail.com"
     }
   },
   "nav": [
@@ -410,7 +409,7 @@
     "education": [
       {
         "institution": "Western Governors University",
-        "credential": "B.S. Cloud Computing, AWS track",
+        "credential": "B.S. Cloud and Network Engineering, AWS track",
         "status": "In progress",
         "icon": "GraduationCap"
       }
