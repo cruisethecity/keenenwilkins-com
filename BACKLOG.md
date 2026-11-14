@@ -1,6 +1,6 @@
 # Backlog
 
-Last updated 10 October 2026. L5 done, infrastructure is live. Resume at L6.
+Last updated 14 November 2026. First CI run failed on both workflows. Cause traced to GitHub's July 2026 subject claim change, fix written, see M17 and M18. Resume at the block below.
 
 ## Definition of done
 
@@ -14,6 +14,19 @@ nothing for a stranger to read. Several claims remain unverified.
 ---
 
 ## Resume here
+
+**State as of 14 November 2026.** The first push that reached CI, `4653ea6`,
+failed on both workflows at the assume role step. M17 is the cause and M18 is
+the trap that would have sprung right after it. Both fixes are written and
+uncommitted. In order:
+
+1. ~~Print the two IDs~~ Done 14 Nov.
+2. ~~Put them in `terraform/environments/prod/shared.auto.tfvars`~~ Done 14 Nov.
+3. ~~`terraform plan`~~ Done 14 Nov, 0 to add, 3 to change, 0 to destroy.
+4. ~~`terraform apply`~~ Done 14 Nov. `github_trusted_subjects` shows the
+   owner and repository IDs in every subject.
+5. Commit, scrub the phone number, push. Do not rerun the frontend deploy
+   before the scrub, because `4653ea6` still has the number in the bundle.
 
 **State as of 10 October 2026.** Infrastructure is live. The site is not.
 
@@ -152,8 +165,8 @@ repo without a paid GitHub plan. The $100 cloud session credit expires
 | L3 | ~~Terraform proves out~~ Done 9 Oct, `scripts/verify.sh` green on every gate | Both roots pass `terraform validate` | done |
 | L4 | ~~Bootstrap remote state~~ Done 10 Oct | `backend.hcl` exists and `terraform init` reports the s3 backend at `prod/terraform.tfstate` | done |
 | L5 | ~~First apply, local, `enable_custom_domain = false`~~ Done 10 Oct | `terraform output site_url` returns `https://dqviqcoub6ym4.cloudfront.net` | done. Serves 403, not the page, because L7 has not run |
-| L6 | Wire GitHub. Commands are in **Resume here** above | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | **next** |
-| L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | blocked by L6 |
+| L6 | Wire GitHub. Commands are in **Resume here** above | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | variables done. The `production` environment is still missing and waits on the repo going public |
+| L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | tried 14 Nov on `4653ea6`, both workflows failed at assume role, see M17 |
 | L8 | Custom domain. Optional, last | Domain resolves over HTTPS with a valid ACM certificate and `www` redirects to apex | open |
 
 ---
@@ -178,6 +191,9 @@ stops thinking about them.
 | M11 | The counter endpoint returns a JSON integer that is larger on a second call | open, L5 done so this is now testable |
 | M15 | The backend workflow runs `plan` on `pull_request`, but the OIDC trust policy allows only `ref:refs/heads/main` and `environment:production`. A pull request token carries `sub=repo:owner/name:pull_request`, which matches neither, so STS refuses and the plan job fails on every PR. Pushes to `main` are unaffected. Fix by adding the `pull_request` subject to `additional_subjects`, noting a fork PR cannot reach it anyway because GitHub withholds `id-token: write` from fork workflows | open |
 | M16 | `output "repository_variables"` emits nine of the ten variables the workflows read. `VITE_SITE_URL` is missing, and the only step that reads it, the live site check at the end of the frontend deploy, is written to skip itself silently when it is empty. So a missing value turns off the one check that proves the deploy worked. Add it to the output, and drop the dead `VITE_SITE_URL` injection at `frontend-deploy.yml` line 68, which nothing in `frontend/src` reads | open |
+| M17 | Both workflows failed on the first push that reached CI, `4653ea6` on 14 Nov. GitHub changed the OIDC subject claim on 15 July 2026 for every repository created after that date, from `repo:owner/name:...` to `repo:owner@OWNER_ID/name@REPO_ID:...`. This repository was created in October, so its tokens carry the new form, and the trust policies were written in the old one and matched nothing. The module now takes `github_owner_id` and `github_repository_id` and builds the new form when both are set. Passing: both IDs set in `shared.auto.tfvars`, `terraform output github_trusted_subjects` shows an `@` in every subject, and the frontend deploy gets past assume role | applied 14 Nov, 0 added, 3 changed, 0 destroyed, with owner `229628263` and repository `1402324462`. Still needs a green CI run to close. Cause confirmed 14 Nov: both failed runs carry the annotation `Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity`, and the repository was created 2 October 2026 |
+| M18 | CI never saw `terraform.tfvars`, because it is gitignored, and received only three values by environment variable. Every other setting fell back to its default there. Today that would only strip the `Owner` tag. Once `enable_custom_domain` is true on the laptop, a CI plan would default it to false and propose removing the certificate, the DNS records and the aliases, and with no approval gate the apply would follow. Settings now live in the tracked `terraform/environments/prod/shared.auto.tfvars`, which Terraform loads by itself in both places, and `terraform.tfvars` keeps only the account scoped names. Passing: a CI plan on an unchanged tree reports no changes | code written 14 Nov, unproven until the first CI plan runs |
+| M19 | `frontend/src/content/posts/keyless-deploys-with-oidc.md` line 60 prints the trust policy subject in the old form. Once M17 is applied the real policy carries the IDs and the post no longer matches the code. Update the snippet. The failure itself is a real debugging story and may be worth a paragraph | open |
 | M13 | `README.md` still describes the pre rebuild site: titled "Apple styled Cloud Resume", calls ProLineup a bento grid, describes GlassHeader as a single `bg-black/75` bar, and omits `FeatureBand.jsx`, `lib/posts.js`, `data/externalPosts.json`, `scripts/sync-devto.mjs`, `scripts/apple-audit.mjs`, `CLAUDE.md` and `BACKLOG.md` | open |
 | M14 | The repo has no description and no topics on GitHub. The name no longer says what the stack is, so the description has to | open |
 | M12 | ~~Delete the empty `scripts/` directory~~ It now holds `apple-audit.mjs` | done |
@@ -332,7 +348,25 @@ Trusted level does not.
 have been copied into this file as numbered criteria with real numbers in
 them. Then this item closes and does not reopen.
 
-**Status:** open, script written and waiting to run.
+**Measured 13 November 2026** against `/iphone-18-pro/`, `/ipad-pro/` and
+`/macbook-air/` at 1440 wide, read out of a live browser. The full table, the
+four bugs it surfaced and the things deliberately left alone are in
+`docs/apple-audit.md`. The criteria, all passing on the build that was measured:
+
+1. No type on the page resolves larger than 96px at 1440 wide.
+2. The hero headline renders as exactly two lines at 768, 1024, 1280, 1440 and 1920 wide.
+3. Display type from 48px up carries tracking between -0.025em and -0.01em.
+4. Every `.pill` computes to `rgb(0, 113, 227)` with white text, on light and dark grounds.
+5. Every `.band-card` computes to a 28px radius, a 0px border and no box shadow.
+6. `.global-nav` and `.product-nav` compute a `backdrop-filter` that is not `none` in Chromium.
+7. Section eyebrows resolve to 21px at 1440 and are not link blue.
+8. Ledes resolve to weight 600.
+9. No highlight card is wider than the viewport at 390 wide.
+10. The pinned feature band content is shorter than its sticky box at 1280 by 720.
+
+**Status:** done. Closed 13 November 2026. It reopens only if KJ looks at the
+result and disagrees with one of the calls listed under "Measured, and
+deliberately left alone" in the audit.
 
 ### J4. A repo link on the Serverless Resume Platform tile
 It is the only tile with no link, because the repo does not exist yet.
