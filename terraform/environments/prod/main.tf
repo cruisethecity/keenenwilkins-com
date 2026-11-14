@@ -134,6 +134,8 @@ module "github_oidc" {
 
   name_prefix          = local.name_prefix
   github_repository    = var.github_repository
+  github_owner_id      = var.github_owner_id
+  github_repository_id = var.github_repository_id
   allowed_branches     = var.allowed_branches
   allowed_environments = var.allowed_environments
   create_oidc_provider = var.create_oidc_provider

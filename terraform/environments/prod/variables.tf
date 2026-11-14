@@ -102,6 +102,18 @@ variable "github_repository" {
   type        = string
 }
 
+variable "github_owner_id" {
+  description = "Numeric ID of the GitHub account that owns the repository. GitHub puts it in the OIDC subject claim for repositories created after 15 July 2026."
+  type        = string
+  default     = ""
+}
+
+variable "github_repository_id" {
+  description = "Numeric ID of the repository, the other half of the same subject claim."
+  type        = string
+  default     = ""
+}
+
 variable "allowed_branches" {
   description = "Branches allowed to assume the deploy roles."
   type        = list(string)

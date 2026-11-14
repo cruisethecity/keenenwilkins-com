@@ -63,6 +63,11 @@ output "github_apply_role_arn" {
   value       = module.github_oidc.backend_apply_role_arn
 }
 
+output "github_trusted_subjects" {
+  description = "OIDC subject claims each CI role trusts. Compare these with the claim in a failed run when assume role is refused."
+  value       = module.github_oidc.allowed_subjects
+}
+
 output "repository_variables" {
   description = "Every GitHub repository variable this pipeline needs, in one place."
 

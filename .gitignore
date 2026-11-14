@@ -24,6 +24,8 @@ crash.log
 crash.*.log
 *.tfvars
 !*.tfvars.example
+# tracked on purpose, holds no account names, see the comment at its top
+!terraform/environments/prod/shared.auto.tfvars
 .terraform.lock.hcl.bak
 override.tf
 override.tf.json

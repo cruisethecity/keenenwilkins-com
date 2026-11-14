@@ -61,6 +61,8 @@ github_repository = "cruisethecity/keenenwilkins-com"
 state_bucket_name = "cloud-resume-tfstate-<your account id>"
 ```
 
+Every other setting is in `shared.auto.tfvars`, which is tracked and which CI reads as well. Terraform loads it by itself. For a repository created after 15 July 2026, set `github_owner_id` and `github_repository_id` there before the first apply. `gh api repos/OWNER/NAME --jq '.owner.id, .id'` prints both.
+
 Then initialize and plan:
 
 ```bash
@@ -157,7 +159,7 @@ npm run build
 npm run preview  # serves the production build on 4173
 ```
 
-`http://localhost:5173` is on the API allowlist by default, so the telemetry badge goes green against the real DynamoDB counter while you are developing. Set `allow_local_development_origin = false` in tfvars and reapply when you are done iterating.
+`http://localhost:5173` is on the API allowlist by default, so the telemetry badge goes green against the real DynamoDB counter while you are developing. Set `allow_local_development_origin = false` in `shared.auto.tfvars` and reapply when you are done iterating.
 
 If the badge reads "Telemetry not configured", `VITE_API_BASE_URL` was empty at build time. Vite inlines that value during the build, so it has to be set before `npm run build`, not at runtime.
 
@@ -203,7 +205,7 @@ The backend workflow will pause at the apply job waiting for your approval. The 
 
 ## Phase 10. Attach a custom domain later
 
-Nothing in the stack has to change. Buy the domain, create the hosted zone, then:
+Nothing in the stack has to change. Buy the domain, create the hosted zone, then set these in `terraform/environments/prod/shared.auto.tfvars`, not in `terraform.tfvars`. CI never sees `terraform.tfvars`, so a domain switched on there would be switched off again by the next pipeline run.
 
 ```hcl
 enable_custom_domain      = true
@@ -223,10 +225,10 @@ That single apply requests the certificate in us-east-1, writes the DNS validati
 ## Troubleshooting
 
 **`Error: creating IAM OIDC Provider: EntityAlreadyExists`**
-Another project in this account already created the GitHub provider. Set `create_oidc_provider = false` in tfvars and reapply.
+Another project in this account already created the GitHub provider. Set `create_oidc_provider = false` in `shared.auto.tfvars` and reapply.
 
 **`Not authorized to perform sts:AssumeRoleWithWebIdentity`**
-The subject claim does not match the trust policy. Run `terraform output -json` and look at `github_oidc.allowed_subjects`, then compare it to the run's actual claim in the workflow log. Nine times out of ten the branch is not `main`, or the `production` environment name has a typo.
+The subject claim does not match the trust policy. Run `terraform output github_trusted_subjects` and compare it to the claim the run actually sent. If the trusted subjects read `repo:owner/name:...` with no `@`, the repository was created after 15 July 2026 and GitHub now sends `repo:owner@OWNER_ID/name@REPO_ID:...`, which the older form never matches. Print the two IDs with `gh api repos/OWNER/NAME --jq '.owner.id, .id'`, set `github_owner_id` and `github_repository_id` in `shared.auto.tfvars` and reapply. If the IDs are already there, the branch is not `main`, or the `production` environment name has a typo.
 
 **`Error: Invalid identity token`**
 The workflow is missing `permissions: id-token: write`.

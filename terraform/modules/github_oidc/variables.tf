@@ -13,6 +13,33 @@ variable "github_repository" {
   }
 }
 
+variable "github_owner_id" {
+  description = "Numeric ID of the account that owns the repository. Needed for any repository created, renamed or transferred after 15 July 2026. Leave empty for an older one."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[0-9]*$", var.github_owner_id))
+    error_message = "github_owner_id must contain digits only."
+  }
+}
+
+variable "github_repository_id" {
+  description = "Numeric ID of the repository. Set it together with github_owner_id, or leave both empty."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[0-9]*$", var.github_repository_id))
+    error_message = "github_repository_id must contain digits only."
+  }
+
+  validation {
+    condition     = (var.github_repository_id == "") == (var.github_owner_id == "")
+    error_message = "Set github_owner_id and github_repository_id together, or leave both empty."
+  }
+}
+
 variable "allowed_branches" {
   description = "Branches whose workflow runs may assume these roles."
   type        = list(string)

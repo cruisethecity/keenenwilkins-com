@@ -1,7 +1,7 @@
 # Copy to terraform.tfvars and edit. The real file is gitignored.
-
-aws_region   = "us-east-1"
-project_name = "cloud-resume"
+#
+# Only the names tied to one AWS account belong here. Every other setting
+# lives in shared.auto.tfvars, which is tracked so that CI reads it as well.
 
 # Repository CI runs from, in owner/name form.
 github_repository = "cruisethecity/keenenwilkins-com"
@@ -9,26 +9,3 @@ github_repository = "cruisethecity/keenenwilkins-com"
 # Printed by terraform/bootstrap.
 state_bucket_name     = "cloud-resume-tfstate-000000000000"
 state_lock_table_name = "cloud-resume-tf-locks"
-
-# Phase one. The site ships on its CloudFront hostname and no DNS is touched.
-enable_custom_domain = false
-
-# Phase two. Buy the domain, create the hosted zone, then uncomment these
-# three lines, set enable_custom_domain to true and apply again. Nothing else
-# in the stack changes.
-#
-# enable_custom_domain      = true
-# hosted_zone_name          = "keenenwilkins.com"
-# domain_name               = "keenenwilkins.com"
-# subject_alternative_names = ["www.keenenwilkins.com"]
-
-# Set to false once you are done iterating and no longer run vite against the
-# live API.
-allow_local_development_origin = true
-
-cloudfront_price_class = "PriceClass_100"
-log_retention_days     = 30
-
-tags = {
-  Owner = "Keenen Wilkins"
-}

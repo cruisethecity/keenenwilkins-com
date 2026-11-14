@@ -18,13 +18,31 @@
 locals {
   github_issuer = "token.actions.githubusercontent.com"
 
-  # A subject claim looks like repo:owner/name:ref:refs/heads/main,
-  # repo:owner/name:environment:production or repo:owner/name:pull_request.
-  # Pinning it is the whole point. A trust policy with sub set to
-  # repo:owner/name:* would trust anything the repository can produce.
-  branch_subjects      = [for branch in var.allowed_branches : "repo:${var.github_repository}:ref:refs/heads/${branch}"]
-  environment_subjects = [for environment in var.allowed_environments : "repo:${var.github_repository}:environment:${environment}"]
-  pull_request_subject = ["repo:${var.github_repository}:pull_request"]
+  # GitHub changed the subject claim on 15 July 2026. Any repository created,
+  # renamed or transferred after that date sends the numeric owner and
+  # repository IDs next to the names.
+  #
+  #   before   repo:owner/name:ref:refs/heads/main
+  #   after    repo:owner@1234/name@5678:ref:refs/heads/main
+  #
+  # The IDs never change, so a deleted account or repository name that someone
+  # else registers later cannot produce a matching claim. The cost is that a
+  # trust policy still written in the older form matches nothing, and STS
+  # refuses the assume role call. Supplying both IDs switches every subject
+  # below to the newer form. Leaving both empty keeps the older one, which is
+  # what a repository created before the change still sends.
+  github_owner         = split("/", var.github_repository)[0]
+  github_name          = split("/", var.github_repository)[1]
+  uses_immutable_claim = var.github_owner_id != "" && var.github_repository_id != ""
+  repository_claim     = local.uses_immutable_claim ? "repo:${local.github_owner}@${var.github_owner_id}/${local.github_name}@${var.github_repository_id}" : "repo:${var.github_repository}"
+
+  # A subject claim ends in ref:refs/heads/main, environment:production or
+  # pull_request. Pinning it is the whole point. A trust policy whose subject
+  # is the repository followed by a wildcard would trust anything the
+  # repository can produce.
+  branch_subjects      = [for branch in var.allowed_branches : "${local.repository_claim}:ref:refs/heads/${branch}"]
+  environment_subjects = [for environment in var.allowed_environments : "${local.repository_claim}:environment:${environment}"]
+  pull_request_subject = ["${local.repository_claim}:pull_request"]
 
   # Each role trusts only the subjects its own job actually presents, so the
   # separation is enforced by IAM rather than by the workflow file continuing
