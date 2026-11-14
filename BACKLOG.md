@@ -1,54 +1,63 @@
 # Backlog
 
-Last updated 14 November 2026. First CI run failed on both workflows. Cause traced to GitHub's July 2026 subject claim change, fix written, see M17 and M18. Resume at the block below.
+Last updated 14 November 2026. The site is live at keenenwilkins.com and both pipelines have run green. Resume at the block below.
 
 ## Definition of done
 
 The site is live at a URL, every claim on it is true, and a stranger can verify
 the top three claims in under five minutes.
 
-One of three now passes. The infrastructure is deployed and there is a URL,
-but the bucket behind it is empty, so the URL serves a 403 and there is still
-nothing for a stranger to read. Several claims remain unverified.
+One of three now passes, and this time it is real. The site is live at
+`https://keenenwilkins.com` over HTTPS, and the pipeline put the bundle there.
+The other two are the hard part. Several claims on the page are still
+unverified, see the F list, and the repo is private, so a stranger cannot
+check anything yet.
 
 ---
 
 ## Resume here
 
-**State as of 14 November 2026.** The first push that reached CI, `4653ea6`,
-failed on both workflows at the assume role step. M17 is the cause and M18 is
-the trap that would have sprung right after it. Both fixes are written and
-uncommitted. In order:
-
-1. ~~Print the two IDs~~ Done 14 Nov.
-2. ~~Put them in `terraform/environments/prod/shared.auto.tfvars`~~ Done 14 Nov.
-3. ~~`terraform plan`~~ Done 14 Nov, 0 to add, 3 to change, 0 to destroy.
-4. ~~`terraform apply`~~ Done 14 Nov. `github_trusted_subjects` shows the
-   owner and repository IDs in every subject.
-5. Commit, scrub the phone number, push. Do not rerun the frontend deploy
-   before the scrub, because `4653ea6` still has the number in the bundle.
-
-**State as of 10 October 2026.** Infrastructure is live. The site is not.
+**State as of 14 November 2026, evening.** The site is live on its own domain
+and both pipelines have run green.
 
 | | |
 |---|---|
-| Site URL | `https://dqviqcoub6ym4.cloudfront.net` returns 403 until L7, because the bucket is empty |
+| Site | `https://keenenwilkins.com` and `https://www.keenenwilkins.com`. The CloudFront hostname `https://dqviqcoub6ym4.cloudfront.net` still answers |
 | API | `https://csx0oz2840.execute-api.us-east-1.amazonaws.com/visits` |
 | Distribution | `E22SRI686ERPFP` |
 | Site bucket | `cloud-resume-site-556071986480` |
 | Remote state | `s3://cloud-resume-tfstate-556071986480/prod/terraform.tfstate` |
-| Apply result | 34 added, 0 changed, 0 destroyed, 0 errors |
+| Pipelines | Frontend run `43632829788` and backend run `43632832581`, both green, both started by hand, see M20 |
+| Repo | Private. History was rewritten on 14 November to remove personal contact details, so every commit ID from before that date changed |
 
-### Idle cost is $0.00 per month
+### What happened on 14 November
 
-Verified against the code, not assumed. Both DynamoDB tables are
-`PAY_PER_REQUEST`, so they bill nothing without requests. Lambda and API
-Gateway bill per invocation and there are none. The two CloudWatch alarms sit
-inside the always free allowance of ten. The site bucket is empty. There is no
-ACM certificate and no Route 53 hosted zone, because `enable_custom_domain`
-is `false`. Nothing accrues while this sits idle.
+1. The first push to reach CI failed on both workflows at the assume role
+   step. M17 is the cause and M18 is the trap that sat right behind it.
+2. The trust policies were fixed and applied from the laptop, 0 added,
+   3 changed, 0 destroyed.
+3. History was rewritten and force pushed. The push triggered nothing, see
+   M20, so both workflows were started with `gh workflow run`. Both went green
+   and the site returned 200 for the first time.
+4. The custom domain was switched on in `shared.auto.tfvars` and applied,
+   8 added, 2 changed, 0 destroyed.
 
-### First command tomorrow
+### Next, in order
+
+1. Decide how the repo goes public, L1.
+2. Make it public, then add the approval gate below.
+3. The F list. The resume download is still a placeholder file, F4, and it
+   is the first thing a visitor to the live site can click.
+
+### Cost while idle is $0.50 per month
+
+That is the Route 53 hosted zone for `keenenwilkins.com`. Everything else is
+still free while idle. Both DynamoDB tables are `PAY_PER_REQUEST`, Lambda and
+API Gateway bill per invocation, the two CloudWatch alarms sit inside the
+always free allowance of ten, and the ACM certificate costs nothing. The
+domain itself renews once a year.
+
+### First command of any session
 
 ```bash
 aws sts get-caller-identity
@@ -59,7 +68,10 @@ The Identity Center session is deliberately short lived. If that returns the
 the token expired, run `aws sso login` and approve in the browser. An expired
 token is short lived credentials working as designed, not a broken setup.
 
-### Then do L6, wire GitHub
+### The ten repository variables
+
+`terraform output repository_variables` prints all ten. They are set on the
+repo today. If the repo is ever recreated on GitHub they have to be set again:
 
 ```bash
 REPO=cruisethecity/keenenwilkins-com
@@ -71,24 +83,22 @@ gh variable set AWS_APPLY_ROLE_ARN         --repo $REPO --body "arn:aws:iam::556
 gh variable set S3_BUCKET                  --repo $REPO --body "cloud-resume-site-556071986480"
 gh variable set CLOUDFRONT_DISTRIBUTION_ID --repo $REPO --body "E22SRI686ERPFP"
 gh variable set VITE_API_BASE_URL          --repo $REPO --body "https://csx0oz2840.execute-api.us-east-1.amazonaws.com"
-gh variable set VITE_SITE_URL              --repo $REPO --body "https://dqviqcoub6ym4.cloudfront.net"
+gh variable set VITE_SITE_URL              --repo $REPO --body "https://keenenwilkins.com"
 gh variable set TF_STATE_BUCKET            --repo $REPO --body "cloud-resume-tfstate-556071986480"
 gh variable set TF_LOCK_TABLE              --repo $REPO --body "cloud-resume-tf-locks"
 
 gh variable list --repo $REPO   # expect ten rows
 ```
 
-`gh` is not installed on this Mac as of 10 October. Run
-`brew install gh && gh auth login` first or every line above fails with
-`command not found`.
-
 None of those ten are credentials, so a shell prompt is a fine place for them.
-`VITE_SITE_URL` is not in the `repository_variables` output yet, see M16, which
-is why it is written out by hand above.
+A recreated repo also gets a new repository ID, which has to go into
+`github_repository_id` in `shared.auto.tfvars` and be applied before any
+workflow can assume a role, see M17.
 
-Then the approval gate:
+### The approval gate, once the repo is public
 
 ```bash
+REPO=cruisethecity/keenenwilkins-com
 MY_ID=$(gh api user --jq .id)
 gh api -X PUT "repos/$REPO/environments/production" --input - <<JSON
 {
@@ -103,15 +113,15 @@ JSON
 `prevent_self_review` must stay `false`. KJ is the only reviewer, so turning it
 on means nobody is ever permitted to approve a deploy and the apply job blocks
 forever. A 422 about protection rules means required reviewers need a paid
-GitHub plan on a private repo. The environment is still created and the
-pipeline still runs, the gate just is not enforced until the repo is public.
+GitHub plan on a private repo. Until the gate exists the backend pipeline
+applies without asking.
 
-Then L7, trigger the first deploy. The tree is clean, so dispatch it rather
-than faking an empty commit:
+### To start a deploy by hand
 
 ```bash
-gh workflow run frontend-deploy.yml --repo $REPO --ref main
-gh run watch --repo $REPO
+gh workflow run frontend-deploy.yml --ref main
+gh workflow run backend-deploy.yml --ref main
+gh run list --limit 4
 ```
 
 ---
@@ -152,22 +162,21 @@ answer from KJ.
 
 In dependency order. Full detail and per step cost in the launch runbook.
 
-**L1 is the remaining bottleneck**, now only its visibility half. The repo is
-pushed but still private, so no stranger can verify a single claim the site
+**L1 is the remaining bottleneck.** The site is live and the pipelines work,
+but the repo is private, so no stranger can verify a single claim the site
 makes, and the required reviewer gate in L6 cannot be enforced on a private
-repo without a paid GitHub plan. The $100 cloud session credit expires
-5 November.
+repo without a paid GitHub plan.
 
 | ID | Item | Acceptance criterion | Status |
 |---|---|---|---|
-| L1 | ~~Push to GitHub~~ Pushed 2 Oct as `fbcd013`, 107 files. **Still private, needs to be public** | Repo loads logged out, which it does not yet | blocked on visibility |
+| L1 | ~~Push to GitHub~~ Pushed 2 Oct, 107 files. History rewritten 14 Nov to remove personal contact details, so every earlier commit ID changed. Public briefly on 14 Nov, then set back to private. **Private, needs to be public** | Repo loads logged out, which it does not yet | blocked on one decision about how it goes public |
 | L2 | ~~New AWS account~~ Done 9 Oct. Access is IAM Identity Center with short lived credentials, no IAM users and no access keys anywhere | `aws sts get-caller-identity` returns `AWSReservedSSO_AdministratorAccess_.../Kj-Admin` in account `556071986480` | done, except the $5 billing alarm |
 | L3 | ~~Terraform proves out~~ Done 9 Oct, `scripts/verify.sh` green on every gate | Both roots pass `terraform validate` | done |
 | L4 | ~~Bootstrap remote state~~ Done 10 Oct | `backend.hcl` exists and `terraform init` reports the s3 backend at `prod/terraform.tfstate` | done |
-| L5 | ~~First apply, local, `enable_custom_domain = false`~~ Done 10 Oct | `terraform output site_url` returns `https://dqviqcoub6ym4.cloudfront.net` | done. Serves 403, not the page, because L7 has not run |
-| L6 | Wire GitHub. Commands are in **Resume here** above | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | variables done. The `production` environment is still missing and waits on the repo going public |
-| L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | tried 14 Nov on `4653ea6`, both workflows failed at assume role, see M17 |
-| L8 | Custom domain. Optional, last | Domain resolves over HTTPS with a valid ACM certificate and `www` redirects to apex | open |
+| L5 | ~~First apply, local, `enable_custom_domain = false`~~ Done 10 Oct | `terraform output site_url` returns `https://dqviqcoub6ym4.cloudfront.net` | done |
+| L6 | Wire GitHub. Commands are in **Resume here** above | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | variables done. The required reviewer waits on the repo being public |
+| L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | green 14 Nov on runs `43632829788` and `43632832581`, site 200, badge read 1 and later 10. Both runs were started by hand, because the force push triggered nothing, see M20. A run triggered by an ordinary push is still to be shown |
+| L8 | Custom domain | Domain resolves over HTTPS with a valid ACM certificate and `www` redirects to apex | applied 14 Nov, 8 added, 2 changed, 0 destroyed. `https://keenenwilkins.com` and `https://www.keenenwilkins.com` both return 200 on the ACM certificate. **`www` serves the page instead of redirecting**, so the criterion is half met |
 
 ---
 
@@ -188,12 +197,13 @@ stops thinking about them.
 | M8 | Every `media.stem` in `resumeData.json` has matching `.webp` and `.png` files at every declared width in `public/media/` | open |
 | M9 | No file in `public/media/` is unreferenced by `resumeData.json`. **Currently fails:** `s3-monitoring-800.webp`, `s3-monitoring-1600.webp` and `s3-monitoring-1600.png` are orphaned, pending F3 | open |
 | M10 | No hyphen appears in any reader visible string in `resumeData.json`, any component string, any `alt` text, or `src/content/posts/*.md`. Scriptable, and worth scripting because this rule breaks silently | open |
-| M11 | The counter endpoint returns a JSON integer that is larger on a second call | open, L5 done so this is now testable |
-| M15 | The backend workflow runs `plan` on `pull_request`, but the OIDC trust policy allows only `ref:refs/heads/main` and `environment:production`. A pull request token carries `sub=repo:owner/name:pull_request`, which matches neither, so STS refuses and the plan job fails on every PR. Pushes to `main` are unaffected. Fix by adding the `pull_request` subject to `additional_subjects`, noting a fork PR cannot reach it anyway because GitHub withholds `id-token: write` from fork workflows | open |
-| M16 | `output "repository_variables"` emits nine of the ten variables the workflows read. `VITE_SITE_URL` is missing, and the only step that reads it, the live site check at the end of the frontend deploy, is written to skip itself silently when it is empty. So a missing value turns off the one check that proves the deploy worked. Add it to the output, and drop the dead `VITE_SITE_URL` injection at `frontend-deploy.yml` line 68, which nothing in `frontend/src` reads | open |
-| M17 | Both workflows failed on the first push that reached CI, `4653ea6` on 14 Nov. GitHub changed the OIDC subject claim on 15 July 2026 for every repository created after that date, from `repo:owner/name:...` to `repo:owner@OWNER_ID/name@REPO_ID:...`. This repository was created in October, so its tokens carry the new form, and the trust policies were written in the old one and matched nothing. The module now takes `github_owner_id` and `github_repository_id` and builds the new form when both are set. Passing: both IDs set in `shared.auto.tfvars`, `terraform output github_trusted_subjects` shows an `@` in every subject, and the frontend deploy gets past assume role | applied 14 Nov, 0 added, 3 changed, 0 destroyed, with owner `229628263` and repository `1402324462`. Still needs a green CI run to close. Cause confirmed 14 Nov: both failed runs carry the annotation `Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity`, and the repository was created 2 October 2026 |
+| M11 | The counter endpoint returns a JSON integer that is larger on a second call | passing 14 Nov. `GET /visits` returned a count of 10 after the badge had read 1 earlier the same day |
+| M15 | The backend workflow runs `plan` on `pull_request`, but the OIDC trust policy allows only `ref:refs/heads/main` and `environment:production`. A pull request token carries `sub=repo:owner/name:pull_request`, which matches neither, so STS refuses and the plan job fails on every PR. Pushes to `main` are unaffected. Fix by adding the `pull_request` subject to `additional_subjects`, noting a fork PR cannot reach it anyway because GitHub withholds `id-token: write` from fork workflows | done 10 Oct. The plan role has its own trust document and it carries the `pull_request` subject |
+| M16 | `output "repository_variables"` emits nine of the ten variables the workflows read. `VITE_SITE_URL` is missing, and the only step that reads it, the live site check at the end of the frontend deploy, is written to skip itself silently when it is empty. So a missing value turns off the one check that proves the deploy worked. Add it to the output, and drop the dead `VITE_SITE_URL` injection at `frontend-deploy.yml` line 68, which nothing in `frontend/src` reads | done 10 Oct. The output prints ten keys and the dead injection is gone from the workflow |
+| M17 | Both workflows failed on the first push that reached CI, on 14 Nov. GitHub changed the OIDC subject claim on 15 July 2026 for every repository created after that date, from `repo:owner/name:...` to `repo:owner@OWNER_ID/name@REPO_ID:...`. This repository was created in October, so its tokens carry the new form, and the trust policies were written in the old one and matched nothing. The module now takes `github_owner_id` and `github_repository_id` and builds the new form when both are set. Passing: both IDs set in `shared.auto.tfvars`, `terraform output github_trusted_subjects` shows an `@` in every subject, and the frontend deploy gets past assume role | applied 14 Nov, 0 added, 3 changed, 0 destroyed, with owner `229628263` and repository `1402324462`. Closed the same day, both workflows authenticated on runs `43632829788` and `43632832581`. Cause confirmed 14 Nov: both failed runs carry the annotation `Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity`, and the repository was created 2 October 2026 |
 | M18 | CI never saw `terraform.tfvars`, because it is gitignored, and received only three values by environment variable. Every other setting fell back to its default there. Today that would only strip the `Owner` tag. Once `enable_custom_domain` is true on the laptop, a CI plan would default it to false and propose removing the certificate, the DNS records and the aliases, and with no approval gate the apply would follow. Settings now live in the tracked `terraform/environments/prod/shared.auto.tfvars`, which Terraform loads by itself in both places, and `terraform.tfvars` keeps only the account scoped names. Passing: a CI plan on an unchanged tree reports no changes | code written 14 Nov, unproven until the first CI plan runs |
 | M19 | `frontend/src/content/posts/keyless-deploys-with-oidc.md` line 60 prints the trust policy subject in the old form. Once M17 is applied the real policy carries the IDs and the post no longer matches the code. Update the snippet. The failure itself is a real debugging story and may be worth a paragraph | open |
+| M20 | A force push that replaces the whole history does not start a workflow that uses a `paths` filter. On 14 Nov the push of the rewritten `main` created no runs at all and printed no error. The likely cause is that GitHub needs a before and after diff to evaluate `paths`, and two unrelated histories give it nothing to compare. GitHub's docs do not state this, so treat it as the best explanation and not a proven one. Both workflows carry `workflow_dispatch`, which is how they were started. Passing: the next ordinary push that touches `terraform/**` or `frontend/**` creates a run by itself | open until that push |
 | M13 | `README.md` still describes the pre rebuild site: titled "Apple styled Cloud Resume", calls ProLineup a bento grid, describes GlassHeader as a single `bg-black/75` bar, and omits `FeatureBand.jsx`, `lib/posts.js`, `data/externalPosts.json`, `scripts/sync-devto.mjs`, `scripts/apple-audit.mjs`, `CLAUDE.md` and `BACKLOG.md` | open |
 | M14 | The repo has no description and no topics on GitHub. The name no longer says what the stack is, so the description has to | open |
 | M12 | ~~Delete the empty `scripts/` directory~~ It now holds `apple-audit.mjs` | done |
