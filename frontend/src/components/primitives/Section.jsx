@@ -11,9 +11,8 @@ import { fadeUp, fadeUpSmall, staggerParent, REVEAL_VIEWPORT } from "../../lib/m
  * content inside will inherit, so nothing below has to know which ground it
  * is sitting on.
  *
- * The header block is Apple's fixed rhythm, in this order every time: a small
- * blue eyebrow, one large headline with tight negative tracking, then an
- * optional muted lede. No gradients on the headline. Apple sets theirs in
+ * The header block is Apple's fixed rhythm, in this order every time: a 21px
+ * neutral eyebrow, one large headline, then an optional semibold gray lede. No gradients on the headline. Apple sets theirs in
  * flat ink, and at these sizes flat is what reads as confident.
  */
 
@@ -55,7 +54,7 @@ export default function Section({
               <Reveal
                 as="p"
                 variants={fadeUpSmall}
-                className="band-link text-[13px] font-semibold tracking-tight"
+                className="band-eyebrow text-eyebrow"
               >
                 {eyebrow}
               </Reveal>
@@ -65,7 +64,7 @@ export default function Section({
               <Reveal
                 as="h2"
                 variants={fadeUp}
-                className="band-ink max-w-4xl text-headline font-semibold tracking-[-0.035em] text-balance"
+                className="band-ink max-w-4xl text-headline font-semibold text-balance"
               >
                 {title}
               </Reveal>
@@ -75,7 +74,7 @@ export default function Section({
               <Reveal
                 as="p"
                 variants={fadeUpSmall}
-                className="band-muted max-w-2xl text-lede text-pretty"
+                className="band-lede max-w-2xl text-lede text-pretty"
               >
                 {lede}
               </Reveal>

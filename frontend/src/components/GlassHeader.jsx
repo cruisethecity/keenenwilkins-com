@@ -76,7 +76,7 @@ export default function GlassHeader({ nav, meta, telemetry, onNavigate }) {
       {/* ---------------------------------------------------- global nav */}
       <div className="global-nav relative z-40">
         <nav
-          className="mx-auto flex h-11 max-w-[980px] items-center justify-between gap-4 px-5"
+          className="mx-auto flex h-11 max-w-[1024px] items-center justify-between gap-4 px-[22px]"
           aria-label="Elsewhere"
         >
           <a
@@ -131,12 +131,12 @@ export default function GlassHeader({ nav, meta, telemetry, onNavigate }) {
         in the hero footnote where nobody scrolling for work would read it.
       */}
       <div className="relative z-40 bg-band">
-        <p className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-5 py-2.5 text-center text-[12px] text-muted sm:px-8">
+        <p className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-5 py-2.5 text-center text-[12px] text-muted sm:px-8 sm:py-4 sm:text-[14px] sm:leading-5">
           {meta.availability}. Open to cloud and DevSecOps roles, remote or Kansas City.
           <button
             type="button"
             onClick={() => onNavigate("contact")}
-            className="chevron-link text-[12px]"
+            className="chevron-link text-[12px] sm:text-[14px]"
           >
             Get in touch
           </button>
@@ -146,7 +146,7 @@ export default function GlassHeader({ nav, meta, telemetry, onNavigate }) {
       {/* --------------------------------------------------- product nav */}
       <header className="product-nav sticky top-0 z-50">
         <nav
-          className="mx-auto flex h-[52px] max-w-6xl items-center justify-between gap-4 px-5 sm:px-8"
+          className="mx-auto flex h-[52px] max-w-[1024px] items-center justify-between gap-4 px-[22px]"
           aria-label="Primary"
         >
           <a
@@ -168,7 +168,7 @@ export default function GlassHeader({ nav, meta, telemetry, onNavigate }) {
                     onClick={(event) => handleJump(event, item.id)}
                     aria-current={isActive ? "true" : undefined}
                     className={`text-[12px] transition-colors duration-300 hover:text-link ${
-                      isActive ? "font-medium text-ink" : "text-ink/60"
+                      isActive ? "font-medium text-ink" : "text-ink/80"
                     }`}
                   >
                     {item.label}
@@ -208,7 +208,7 @@ export default function GlassHeader({ nav, meta, telemetry, onNavigate }) {
               transition={{ duration: 0.35, ease: APPLE_EASE }}
               className="border-t border-rule-soft bg-page/95 backdrop-blur-2xl lg:hidden"
             >
-              <ul className="mx-auto flex max-w-6xl flex-col px-5 py-1 sm:px-8">
+              <ul className="mx-auto flex max-w-[1024px] flex-col px-[22px] py-1">
                 {nav.map((item) => (
                   <li
                     key={item.id}

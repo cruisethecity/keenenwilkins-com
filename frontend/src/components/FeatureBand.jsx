@@ -81,16 +81,16 @@ export default function FeatureBand({ project }) {
               transition={{ duration: 0.9, ease: APPLE_EASE }}
               className="flex flex-col items-center text-center"
             >
-              <span className="band-link mb-5 inline-flex items-center gap-2 text-[13px] font-semibold tracking-tight">
-                <Glyph name={project.icon} size={15} aria-hidden="true" />
+              <span className="band-eyebrow mb-5 inline-flex items-center gap-2.5 text-eyebrow">
+                <Glyph name={project.icon} size={19} aria-hidden="true" />
                 {project.eyebrow}
               </span>
 
-              <h2 className="band-ink max-w-4xl text-headline font-semibold tracking-[-0.04em] text-balance">
+              <h2 className="band-ink max-w-4xl text-headline font-semibold text-balance">
                 {project.title}
               </h2>
 
-              <p className="band-muted mt-6 max-w-2xl text-lede text-pretty">
+              <p className="band-lede mt-6 max-w-2xl text-lede text-pretty">
                 {project.summary}
               </p>
             </motion.div>
@@ -109,7 +109,7 @@ export default function FeatureBand({ project }) {
                   media={project.media}
                   ratio="16 / 7"
                   sizes="(min-width: 1440px) 1400px, 92vw"
-                  className="band-rule-soft max-h-[44vh] rounded-hero border shadow-[0_30px_90px_-40px_rgba(0,0,0,0.38)]"
+                  className="band-rule-soft max-h-[40vh] rounded-hero border shadow-[0_30px_90px_-40px_rgba(0,0,0,0.38)]"
                   imgClassName="object-cover object-top"
                 />
               </motion.div>

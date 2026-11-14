@@ -42,17 +42,17 @@ export default function ContactBand({ contact, meta }) {
 
         <Reveal
           as="h2"
-          className="band-ink text-headline font-semibold tracking-[-0.04em] text-balance"
+          className="band-ink text-headline font-semibold text-balance"
         >
           {contact.headline}
         </Reveal>
 
-        <Reveal as="p" className="band-muted mt-6 max-w-xl text-lede text-pretty">
+        <Reveal as="p" className="band-lede mt-6 max-w-xl text-lede text-pretty">
           {contact.subheadline}
         </Reveal>
 
         <Reveal className="mt-10">
-          <a href={meta.resumePath} download className="pill px-6 py-3 text-[17px]">
+          <a href={meta.resumePath} download className="pill px-[22px] py-3 text-[17px]">
             Download resume
           </a>
         </Reveal>

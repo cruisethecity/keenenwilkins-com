@@ -58,9 +58,13 @@ try {
 const PAGES = process.argv.slice(2).length
   ? process.argv.slice(2)
   : [
-      "https://www.apple.com/macbook-pro/",
+      // Checked 13 November 2026. /macbook-pro/ used to be on this list and is
+      // no longer a product page: it is a two model chooser with almost nothing
+      // to measure. Before trusting a run, confirm these are still the long
+      // flagship pages this script assumes.
+      "https://www.apple.com/iphone-18-pro/",
       "https://www.apple.com/ipad-pro/",
-      "https://www.apple.com/mac-studio/",
+      "https://www.apple.com/macbook-air/",
     ];
 
 const VIEWPORT = { width: 1440, height: 900 };
@@ -373,7 +377,7 @@ for (const r of results) {
   row(new URL(r.url).pathname, r.containers.map((c) => `${c.value}px (${c.count})`).join(", ") || "n/a");
 }
 L.push("");
-L.push("Ours: `max-w-6xl`, which is 1152px, and `max-w-[980px]` on the global nav.");
+L.push("Ours: `max-w-6xl`, which is 1152px, and 980px of content inside both nav bars.");
 L.push("");
 
 writeFileSync(resolve(ROOT, "docs/apple-audit.md"), L.join("\n"));

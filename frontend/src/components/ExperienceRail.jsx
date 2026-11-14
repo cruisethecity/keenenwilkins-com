@@ -44,7 +44,7 @@ export default function ExperienceRail({ experience }) {
             </div>
 
             <div>
-              <h3 className="band-ink text-title font-semibold tracking-[-0.03em]">
+              <h3 className="band-ink text-title font-semibold">
                 {role.role}
               </h3>
 
@@ -52,7 +52,7 @@ export default function ExperienceRail({ experience }) {
                 {role.company}
               </p>
 
-              <p className="band-ink mt-4 text-[16px] leading-relaxed">
+              <p className="band-ink mt-4 text-[17px] leading-[1.47]">
                 {role.summary}
               </p>
 
@@ -60,7 +60,7 @@ export default function ExperienceRail({ experience }) {
                 {role.bullets.map((bullet) => (
                   <li
                     key={bullet}
-                    className="band-muted relative pl-5 text-[15px] leading-relaxed"
+                    className="band-muted relative pl-5 text-[17px] leading-[1.47]"
                   >
                     <span
                       className="bg-link absolute top-[0.65em] left-0 h-1 w-1 rounded-full"

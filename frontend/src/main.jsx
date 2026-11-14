@@ -5,7 +5,12 @@ import { createRoot } from "react-dom/client";
 // Fonts keeps the Content Security Policy tight, removes a third party DNS
 // lookup from the critical path, and means the headline never renders in a
 // fallback face first.
-import "@fontsource-variable/inter";
+//
+// The opsz build carries Inter's optical size axis as well as weight. From
+// 32px up the browser switches to the Display cut by itself, which is the
+// same split Apple makes between SF Pro Text and SF Pro Display, and it is
+// why the headlines no longer need heavy negative tracking to look set.
+import "@fontsource-variable/inter/opsz.css";
 
 import "./index.css";
 import App from "./App.jsx";

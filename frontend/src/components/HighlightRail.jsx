@@ -15,6 +15,11 @@ import { fadeUp, staggerParent, REVEAL_VIEWPORT_CONTAINER } from "../lib/motion.
  * On narrow screens this becomes a horizontal snap scroller rather than a
  * stack, which is what Apple does and what keeps the numbers large on a phone
  * instead of shrinking them to fit four across.
+ *
+ * Each card has a fixed width on phones, not a minimum width. With only a
+ * minimum, a flex item inside a scroller grows to fit its longest sentence on
+ * one line, and the four cards measured between 632 and 1096 pixels wide on a
+ * 390 pixel screen.
  */
 export default function HighlightRail({ highlights }) {
   return (
@@ -22,7 +27,7 @@ export default function HighlightRail({ highlights }) {
       <div className="mx-auto max-w-6xl">
         <Reveal
           as="h2"
-          className="band-ink mb-10 text-title font-semibold tracking-[-0.03em]"
+          className="band-ink mb-10 text-section font-semibold"
         >
           Get the highlights.
         </Reveal>
@@ -32,13 +37,13 @@ export default function HighlightRail({ highlights }) {
           whileInView="visible"
           viewport={REVEAL_VIEWPORT_CONTAINER}
           variants={staggerParent(0.09)}
-          className="scrollbar-none -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4"
+          className="scrollbar-none -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4"
         >
           {highlights.map((item) => (
             <motion.li
               key={item.id}
               variants={fadeUp}
-              className="band-card group flex min-w-[76vw] shrink-0 snap-center flex-col rounded-tile p-6 sm:min-w-0"
+              className="band-card group flex w-[78vw] shrink-0 snap-center flex-col rounded-tile p-6 sm:w-auto"
             >
               <Glyph
                 name={item.icon}
@@ -48,7 +53,7 @@ export default function HighlightRail({ highlights }) {
               />
 
               <p className="flex items-baseline gap-1">
-                <span className="band-ink text-stat font-semibold tracking-[-0.04em]">
+                <span className="band-ink text-stat font-semibold">
                   {item.value}
                 </span>
                 {item.unit && (

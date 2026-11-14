@@ -213,7 +213,7 @@ export default function ProLineup({ projects }) {
         whileInView="visible"
         viewport={REVEAL_VIEWPORT_CONTAINER}
         variants={staggerParent(0.08)}
-        className="grid grid-cols-1 gap-4 md:grid-cols-2"
+        className="grid grid-cols-1 gap-5 md:grid-cols-2"
       >
         {ordered.map((project) => (
           <ProjectTile key={project.id} project={project} />

@@ -37,7 +37,7 @@ export default function TechSpecs({ specs }) {
             variants={fadeUpSmall}
             className="band-rule grid gap-2 border-b py-7 sm:grid-cols-[minmax(180px,240px)_1fr] sm:gap-10"
           >
-            <dt className="band-muted text-[15px] font-semibold tracking-tight">
+            <dt className="band-muted text-[17px] font-semibold tracking-tight">
               {spec.group}
             </dt>
 
@@ -46,7 +46,7 @@ export default function TechSpecs({ specs }) {
                 {spec.items.map((item) => (
                   <li
                     key={item}
-                    className="band-ink text-[15px] leading-relaxed"
+                    className="band-ink text-[17px] leading-[1.47]"
                   >
                     {item}
                   </li>

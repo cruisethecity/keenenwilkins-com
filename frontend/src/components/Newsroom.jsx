@@ -94,7 +94,7 @@ export default function Newsroom({ posts, onOpenArticle }) {
         whileInView="visible"
         viewport={REVEAL_VIEWPORT_CONTAINER}
         variants={staggerParent(0.09)}
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-5"
       >
         <motion.article
           variants={fadeUp}
@@ -107,7 +107,7 @@ export default function Newsroom({ posts, onOpenArticle }) {
           >
             <Meta post={lead} size="large" />
 
-            <h3 className="band-ink max-w-3xl text-title font-semibold tracking-[-0.03em]">
+            <h3 className="band-ink max-w-3xl text-title font-semibold">
               {lead.title}
             </h3>
 
@@ -122,7 +122,7 @@ export default function Newsroom({ posts, onOpenArticle }) {
         </motion.article>
 
         {rest.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {rest.map((post) => (
               <motion.article
                 key={post.id ?? post.slug}

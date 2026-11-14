@@ -46,12 +46,12 @@ export default function ArticleReader({ post, onBack }) {
             </span>
           </div>
 
-          <h1 className="band-ink text-headline font-semibold tracking-[-0.04em] text-balance">
+          <h1 className="band-ink text-headline font-semibold text-balance">
             {post.title}
           </h1>
 
           {post.summary && (
-            <p className="band-muted mt-5 text-lede leading-relaxed">
+            <p className="band-lede mt-5 text-lede">
               {post.summary}
             </p>
           )}

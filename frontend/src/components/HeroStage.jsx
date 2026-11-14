@@ -11,9 +11,10 @@ import { APPLE_EASE } from "../lib/motion.js";
  * near seven rem over a subhead near one and a half reads as confidence. The
  * same headline at three rem reads as a resume.
  *
- * Tracking is negative and has to be. At display sizes the default letter
- * spacing looks loose and unfinished, which is why every Apple headline sits
- * somewhere near minus four percent.
+ * Tracking is negative, but only slightly. Apple's display type measures
+ * near minus one and a half percent, and the value lives in the text-display
+ * token rather than here. The headline is two lines by design, so the stage
+ * is as wide as Apple's 1260 pixel gallery measure to keep line two whole.
  *
  * The action pair is Apple's, not a generic button row: one filled blue pill
  * for the thing you want people to do, and one blue text link with a chevron
@@ -48,7 +49,7 @@ export default function HeroStage({ hero, meta, onNavigate }) {
 
       <motion.div
         style={{ y: contentY, opacity: contentOpacity }}
-        className="relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center"
+        className="relative z-10 mx-auto flex max-w-[1260px] flex-col items-center text-center"
       >
         <motion.p
           initial={{ opacity: 0, y: 12 }}
@@ -63,7 +64,7 @@ export default function HeroStage({ hero, meta, onNavigate }) {
           <span className="hidden sm:inline">{meta.discipline}</span>
         </motion.p>
 
-        <h1 className="band-ink text-display font-semibold tracking-[-0.045em] text-balance">
+        <h1 className="band-ink text-display font-semibold text-balance">
           {hero.headline.map((line, index) => (
             <motion.span
               key={line}
@@ -85,7 +86,7 @@ export default function HeroStage({ hero, meta, onNavigate }) {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: APPLE_EASE }}
-          className="band-muted mt-7 max-w-2xl text-lede text-pretty"
+          className="band-lede mt-7 max-w-2xl text-lede text-pretty"
         >
           {hero.subheadline}
         </motion.p>
@@ -99,7 +100,7 @@ export default function HeroStage({ hero, meta, onNavigate }) {
           <a
             href={meta.resumePath}
             download
-            className="pill px-6 py-3 text-[17px]"
+            className="pill px-[22px] py-3 text-[17px]"
           >
             Download resume
           </a>

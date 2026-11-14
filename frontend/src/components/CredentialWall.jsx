@@ -64,14 +64,14 @@ export default function CredentialWall({ credentials }) {
       tone="light"
       eyebrow="Credentials"
       title="Certified, and still studying."
-      lede="Five certifications earned, a sixth in flight, and a cloud computing degree underway."
+      lede="Five certifications earned, a sixth in flight, and a cloud and network engineering degree underway."
     >
       <motion.ul
         initial="hidden"
         whileInView="visible"
         viewport={REVEAL_VIEWPORT_CONTAINER}
         variants={staggerParent(0.07)}
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
       >
         {credentials.certifications.map((item) => (
           <CredentialCard
@@ -89,7 +89,7 @@ export default function CredentialWall({ credentials }) {
         whileInView="visible"
         viewport={REVEAL_VIEWPORT_CONTAINER}
         variants={staggerParent(0.07, 0.1)}
-        className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
       >
         {credentials.education.map((item) => (
           <CredentialCard
