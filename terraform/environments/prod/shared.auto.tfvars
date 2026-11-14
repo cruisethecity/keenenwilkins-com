@@ -24,17 +24,14 @@ github_repository_id = "1402324462"
 # Brand new account, so no GitHub OIDC provider existed. Leave this true.
 create_oidc_provider = true
 
-# Phase one. The site ships on its CloudFront hostname and no DNS is touched.
-enable_custom_domain = false
-
-# Phase two. Once the domain registration completes and Route 53 shows the
-# hosted zone, replace the line above with these four and apply again. Nothing
-# else in the stack changes.
-#
-# enable_custom_domain      = true
-# hosted_zone_name          = "keenenwilkins.com"
-# domain_name               = "keenenwilkins.com"
-# subject_alternative_names = ["www.keenenwilkins.com"]
+# The site answers on its own domain. Route 53 registered keenenwilkins.com on
+# 13 November 2026 and created the hosted zone with it. Setting the first line
+# back to false returns the site to its CloudFront hostname and removes the
+# certificate and the DNS records.
+enable_custom_domain      = true
+hosted_zone_name          = "keenenwilkins.com"
+domain_name               = "keenenwilkins.com"
+subject_alternative_names = ["www.keenenwilkins.com"]
 
 # Lets vite dev at localhost:5173 call the live counter API.
 # Set to false once you stop iterating against the deployed backend.
