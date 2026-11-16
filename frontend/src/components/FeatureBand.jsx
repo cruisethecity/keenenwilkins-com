@@ -45,6 +45,18 @@ import { APPLE_EASE } from "../lib/motion.js";
  * The pin is disabled below the medium breakpoint. A tall sticky section on a
  * phone is a lot of thumb work for one scaling image, so small screens get an
  * ordinary stacked layout.
+ *
+ * It is also disabled on short screens, through the pin variant defined in
+ * index.css. A Windows laptop at 150% display scaling leaves a browser about
+ * 650 pixels of height, and the pinned block does not fit in that, so the
+ * eyebrow slid under the nav. Those screens get the stacked layout too.
+ *
+ * The image frame is given an explicit full width. Without it the frame has
+ * an aspect ratio, a height cap and an automatic width, and browsers disagree
+ * about what that means. Chrome and Edge shrink the width to keep the ratio,
+ * which left a narrow image stuck to the left edge of the column. Safari keeps
+ * the width and crops the height, which is the layout this band was drawn
+ * for. A stated width removes the question.
  */
 export default function FeatureBand({ project }) {
   const trackRef = useRef(null);
@@ -71,8 +83,8 @@ export default function FeatureBand({ project }) {
   return (
     <section className="band relative">
       {/* The pinned half. Nothing in here may exceed one screen. */}
-      <div ref={trackRef} className="relative md:min-h-[175vh]">
-        <div className="px-5 pt-28 sm:px-8 sm:pt-36 md:sticky md:top-[52px] md:flex md:h-[calc(100vh-52px)] md:flex-col md:justify-center md:pt-0">
+      <div ref={trackRef} className="relative pin:min-h-[175vh]">
+        <div className="px-5 pt-28 sm:px-8 sm:pt-36 pin:sticky pin:top-[52px] pin:flex pin:h-[calc(100vh-52px)] pin:flex-col pin:justify-center pin:pt-0">
           <div className="mx-auto w-full max-w-6xl">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -109,7 +121,7 @@ export default function FeatureBand({ project }) {
                   media={project.media}
                   ratio="16 / 7"
                   sizes="(min-width: 1440px) 1400px, 92vw"
-                  className="band-rule-soft max-h-[40vh] rounded-hero border shadow-[0_30px_90px_-40px_rgba(0,0,0,0.38)]"
+                  className="band-rule-soft max-h-[40vh] w-full rounded-hero border shadow-[0_30px_90px_-40px_rgba(0,0,0,0.38)]"
                   imgClassName="object-cover object-top"
                 />
               </motion.div>
@@ -118,8 +130,13 @@ export default function FeatureBand({ project }) {
         </div>
       </div>
 
-      {/* Released from the pin. Ordinary flow from here down. */}
-      <div className="px-5 pb-28 sm:px-8 sm:pb-36">
+      {/*
+        Released from the pin. Ordinary flow from here down. The top padding
+        is the gap between the screenshot and its numbers. Stacked layouts
+        need all of it. A pinned layout already has the slack left over from
+        centering, so it takes less.
+      */}
+      <div className="px-5 pt-12 pb-28 sm:px-8 sm:pb-36 pin:pt-4">
         <div className="mx-auto w-full max-w-6xl">
           {project.metrics?.length > 0 && (
             <motion.dl

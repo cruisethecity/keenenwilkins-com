@@ -125,6 +125,21 @@
   --radius-hero: 1.75rem;
 }
 
+/*
+ * THE PIN VARIANT
+ *
+ * The feature band holds its headline and screenshot on screen while the
+ * reader scrolls through it. That only works when the whole composition fits
+ * under the sticky nav, so the pin asks for a tablet width and a browser at
+ * least 720 pixels tall. Anything narrower or shorter gets the ordinary
+ * stacked layout, the same one a phone gets. Use it as pin:sticky.
+ */
+@custom-variant pin {
+  @media (min-width: 48rem) and (min-height: 45rem) {
+    @slot;
+  }
+}
+
 @layer base {
   :root {
     /* The page commits to Apple's light look. It is one designed world with
