@@ -64,7 +64,7 @@ export default function CredentialWall({ credentials }) {
       tone="light"
       eyebrow="Credentials"
       title="Certified, and still studying."
-      lede="Five certifications earned, a sixth in flight, and a cloud and network engineering degree underway."
+      lede="Five certifications earned, the ITIL 4 exam coming up, and a cloud and network engineering degree underway."
     >
       <motion.ul
         initial="hidden"
@@ -82,15 +82,12 @@ export default function CredentialWall({ credentials }) {
             icon={item.icon}
           />
         ))}
-      </motion.ul>
 
-      <motion.ul
-        initial="hidden"
-        whileInView="visible"
-        viewport={REVEAL_VIEWPORT_CONTAINER}
-        variants={staggerParent(0.07, 0.1)}
-        className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-      >
+        {/*
+          The degree sits in the same grid as the certifications. As a grid
+          of its own it left one card alone on a row under another card alone
+          on a row, which read as a mistake.
+        */}
         {credentials.education.map((item) => (
           <CredentialCard
             key={item.institution}

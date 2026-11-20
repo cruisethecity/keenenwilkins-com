@@ -1,6 +1,6 @@
 # Backlog
 
-Last updated 16 November 2026. The site is live at keenenwilkins.com and both pipelines have run green. Resume at the block below.
+Last updated 20 November 2026. The site is live at keenenwilkins.com and both pipelines have run green. Resume at the block below.
 
 ## Definition of done
 
@@ -175,7 +175,7 @@ repo without a paid GitHub plan.
 | L4 | ~~Bootstrap remote state~~ Done 10 Oct | `backend.hcl` exists and `terraform init` reports the s3 backend at `prod/terraform.tfstate` | done |
 | L5 | ~~First apply, local, `enable_custom_domain = false`~~ Done 10 Oct | `terraform output site_url` returns `https://dqviqcoub6ym4.cloudfront.net` | done |
 | L6 | Wire GitHub. Commands are in **Resume here** above | All ten repository variables set, `production` environment exists with KJ as required reviewer, and zero repository secrets | variables done. The required reviewer waits on the repo being public |
-| L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | green 14 Nov on runs `43632829788` and `43632832581`, site 200, badge read 1 and later 10. Both runs were started by hand, because the force push triggered nothing, see M20. A run triggered by an ordinary push is still to be shown |
+| L7 | First CI deploy | Both workflows green on a push to `main`, site returns 200, telemetry badge shows a non zero count that increments on reload | green 14 Nov on runs `43632829788` and `43632832581`, site 200, badge read 1 and later 10. Both runs were started by hand, because the force push triggered nothing, see M20. Since then both have run from ordinary pushes: backend run `43638807034` on 14 Nov, and the frontend on 16 Nov, confirmed by the live stylesheet carrying that push's change |
 | L8 | Custom domain | Domain resolves over HTTPS with a valid ACM certificate and `www` redirects to apex | applied 14 Nov, 8 added, 2 changed, 0 destroyed. `https://keenenwilkins.com` and `https://www.keenenwilkins.com` both return 200 on the ACM certificate. **`www` serves the page instead of redirecting**, so the criterion is half met |
 
 ---
@@ -203,8 +203,10 @@ stops thinking about them.
 | M17 | Both workflows failed on the first push that reached CI, on 14 Nov. GitHub changed the OIDC subject claim on 15 July 2026 for every repository created after that date, from `repo:owner/name:...` to `repo:owner@OWNER_ID/name@REPO_ID:...`. This repository was created in October, so its tokens carry the new form, and the trust policies were written in the old one and matched nothing. The module now takes `github_owner_id` and `github_repository_id` and builds the new form when both are set. Passing: both IDs set in `shared.auto.tfvars`, `terraform output github_trusted_subjects` shows an `@` in every subject, and the frontend deploy gets past assume role | applied 14 Nov, 0 added, 3 changed, 0 destroyed, with owner `229628263` and repository `1402324462`. Closed the same day, both workflows authenticated on runs `43632829788` and `43632832581`. Cause confirmed 14 Nov: both failed runs carry the annotation `Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity`, and the repository was created 2 October 2026 |
 | M18 | CI never saw `terraform.tfvars`, because it is gitignored, and received only three values by environment variable. Every other setting fell back to its default there. Today that would only strip the `Owner` tag. Once `enable_custom_domain` is true on the laptop, a CI plan would default it to false and propose removing the certificate, the DNS records and the aliases, and with no approval gate the apply would follow. Settings now live in the tracked `terraform/environments/prod/shared.auto.tfvars`, which Terraform loads by itself in both places, and `terraform.tfvars` keeps only the account scoped names. Passing: a CI plan on an unchanged tree reports no changes | code written 14 Nov, unproven until the first CI plan runs |
 | M19 | `frontend/src/content/posts/keyless-deploys-with-oidc.md` line 60 prints the trust policy subject in the old form. Once M17 is applied the real policy carries the IDs and the post no longer matches the code. Update the snippet. The failure itself is a real debugging story and may be worth a paragraph | open |
-| M20 | A force push that replaces the whole history does not start a workflow that uses a `paths` filter. On 14 Nov the push of the rewritten `main` created no runs at all and printed no error. The likely cause is that GitHub needs a before and after diff to evaluate `paths`, and two unrelated histories give it nothing to compare. GitHub's docs do not state this, so treat it as the best explanation and not a proven one. Both workflows carry `workflow_dispatch`, which is how they were started. Passing: the next ordinary push that touches `terraform/**` or `frontend/**` creates a run by itself | passing 14 Nov. The next ordinary push started backend run `43638807034` by itself and it went green. The frontend workflow has still only run by hand, because no push since has touched `frontend/**` |
+| M20 | A force push that replaces the whole history does not start a workflow that uses a `paths` filter. On 14 Nov the push of the rewritten `main` created no runs at all and printed no error. The likely cause is that GitHub needs a before and after diff to evaluate `paths`, and two unrelated histories give it nothing to compare. GitHub's docs do not state this, so treat it as the best explanation and not a proven one. Both workflows carry `workflow_dispatch`, which is how they were started. Passing: the next ordinary push that touches `terraform/**` or `frontend/**` creates a run by itself | passing 14 Nov. The next ordinary push started backend run `43638807034` by itself and it went green. The frontend workflow followed on 16 Nov, when the feature band fix was pushed and went live without a manual start |
 | M21 | In the feature band the screenshot fills its column and sits centered, and nothing in the pinned block slides under the nav. Reported 16 Nov from Edge on a Windows laptop: the image was narrow and stuck to the left. Cause: the frame had an aspect ratio, a height cap and no stated width. Chrome and Edge shrink the width to keep the ratio, Safari keeps the width and crops the height. It was off center in every Chromium browser at every desktop size, by 82 to 249 pixels, and the 13 Nov Apple pass missed it because that pass measured overflow and never measured centering. Fixed with a stated full width, plus a `pin` variant that skips the sticky layout when the browser is under 720 pixels tall. Passing: frame width equals column width and the offset from page center is 0 at 13 sizes from 390 to 2560 wide | fixed 16 Nov, measured in headless Chromium at all 13 sizes. Safari and a real phone are checked by eye only |
+| M22 | The credentials wall shows only what is true today. The Terraform Associate card is gone, because that study is on hold. ITIL 4 Foundation reads `Exam prep`, on KJ's word of 20 Nov that he is getting ready to test. CompTIA A+ reads `This term at WGU`, because it is on the current term and not started. The degree card sits in the same grid so no card is alone on a row. Passing: no card claims more progress than KJ has stated | changed 16 Nov, updated 20 Nov |
+| M23 | The stat rail says 42 resources in production, every one in Terraform. That replaced `100% of this stack is code` on 20 Nov, because the domain was registered by hand and its hosted zone came with it, so 100 percent was no longer exact. The 42 is the first apply's 34 plus the 8 the domain added. Passing: `terraform state list` in `terraform/environments/prod`, counting managed resources only, prints the number on the page | open, counted from the apply output and not yet from state |
 | M13 | `README.md` still describes the pre rebuild site: titled "Apple styled Cloud Resume", calls ProLineup a bento grid, describes GlassHeader as a single `bg-black/75` bar, and omits `FeatureBand.jsx`, `lib/posts.js`, `data/externalPosts.json`, `scripts/sync-devto.mjs`, `scripts/apple-audit.mjs`, `CLAUDE.md` and `BACKLOG.md` | open |
 | M14 | The repo has no description and no topics on GitHub. The name no longer says what the stack is, so the description has to | open |
 | M12 | ~~Delete the empty `scripts/` directory~~ It now holds `apple-audit.mjs` | done |
@@ -218,30 +220,35 @@ currently a claim on a page that strangers will read, or a gap that stops a
 claim from being made.
 
 ### F1. The "Under 60s" alert to containment metric
-On the threat pipeline, front and center on the feature band.
-
-Nobody has measured it. It is the single most impressive number on the site and
-the one most likely to be asked about in an interview, which is the worst
-combination for an unverified figure.
+Was on the threat pipeline, front and center on the feature band, and nobody
+had measured it.
 
 **Acceptance:** either a timestamp pair from a real alert and its containment
 action that supports the number, or the metric is replaced with one that can be
 supported, or removed.
 
-**Status:** open. Blocks launch.
+**Status:** replaced 20 Nov. The tile now reads `30s`, hard limit on the
+containment Lambda, which is the `timeout = 30` in `remediation.tf` of the
+threat pipeline repo. That is a design limit read from code, not a measured
+response time. If a real alert and its network ACL entry are ever timed, the
+measured number is the better one to show.
 
 ### F2. What the 77,959 KPI counts
-Used in the stat rail as "events ingested from a live honeypot". The Splunk
-panel is titled "Automation KPI (Big Number)", which is placeholder text, and
-the attacker table beside it includes `10.0.1.123`, a private address, so at
-least some of that traffic is internal rather than attacker.
+Was in the stat rail as "events ingested from a live honeypot", with a line
+saying the attacker addresses were organic and not simulated. The label was
+Claude's wording and was never confirmed. Checked on 20 Nov against the honeypot
+repo, it was wrong in three ways. That lab ran a scripted attack, so the
+traffic was not all organic. Both subnets were public, so the VPC was not
+locked down. And the number 77,959 appears nowhere in that repo.
 
-The label is Claude's wording, not KJ's, and it has never been confirmed.
+**Status:** removed 20 Nov. The stat rail now reads `1`, line of Terraform
+closed an exposed database, and the honeypot tile is rewritten to say what the
+repo's README says: a database left open on purpose, a scripted attack, real
+scanners in the same capture, one changed line to close it. The long tail of
+real scanners was checked in `sample_flow.log` itself.
 
-**Acceptance:** KJ states what that search actually counted, and the stat rail
-label matches it exactly.
-
-**Status:** open. Blocks launch.
+Still open, see J1: the screenshot on that tile shows the 77,959 panel, and
+nothing on the page explains the number any more.
 
 ### F3. Which project owns the S3 monitoring screenshot
 Three files sit in `public/media/` referenced by nothing. The dashboard is
@@ -271,18 +278,33 @@ real resume, it is larger than 20 KB, it links `github.com/cruisethecity`, and
 its employment dates match `resumeData.json` exactly (Sazerac July 2022 to
 August 2024, Zumiez December 2013 to December 2021).
 
-**Status:** open. Blocks launch. Needs KJ to put the real PDF somewhere this
-session can reach, or to drop it into `public/resume/` himself.
+**Status:** replaced 16 Nov, waiting on KJ to read it line by line. The file is
+now 51,769 bytes, one page, built by `scripts/build-resume.mjs` from
+`resumeData.json`, so the dates and the GitHub link match the site by
+construction. It carries no phone number, lists the degree, and leaves out the
+short figures from the project tiles. Regenerated 20 Nov after the project
+corrections, 52,601 bytes. Every project line now comes straight from the tile
+it belongs to.
 
 ### F5. The i.c.stars bullets
-Three bullets written from things KJ mentioned in conversation, not from
-anything he wrote for publication. The three person team, the weekly dev.to
-series, the guest speaker recaps.
+Rewritten 16 Nov and again 20 Nov at KJ's request, to show what is done and
+what is under way. Five bullets now: his role and what the team is building,
+the design rule that the checks run before any model does, the ten question
+test set and the two sprint reviews it was shown at, the back end he is
+building now, and the program work beside the project. The facts were checked against the team's own Sprint 2 presentation and
+project folder, not taken from conversation. The client is not named and
+nothing from a client meeting is quoted, which is the line his NDA draws.
 
-**Acceptance:** KJ has read all three and either confirmed them or rewritten
+One thing to keep honest: the fourth bullet says he is now building the back
+end in C#, Blazor and PostgreSQL. That work was still in progress on 14 Nov,
+and the final presentation was on the calendar for 20 Nov. The bullet must
+not grow into a claim that the back end is finished until it is, and it
+should change the day it is.
+
+**Acceptance:** KJ has read all five and either confirmed them or rewritten
 them.
 
-**Status:** open.
+**Status:** rewritten 20 Nov, waiting on KJ to read them.
 
 ### F6. Two project tiles have no screenshot
 LogVault and the Serverless Resume Platform. Both are shipped work with nothing
@@ -307,6 +329,25 @@ The detail line credits Kenny Barr with the Splunk detection engineering and
 dashboards, KJ with the AWS infrastructure and Terraform.
 
 **Acceptance:** Kenny has seen that sentence and is fine with it.
+
+**Status:** open.
+
+### F9. Two project READMEs disagree with their own repos
+Found 20 Nov while checking the site's claims against the code.
+
+In the honeypot repo, the README describes `sample_flow.log` as a 1,000 line
+capture and gives line counts per source and 29 destination ports. The file in
+the repo has 720 lines and different counts. One address the README calls a
+real internet actor also shows up in the threat pipeline's dashboard, so its
+attribution is worth a second look.
+
+In the threat pipeline repo, the README says the Lambda role holds only
+`ec2:CreateNetworkAclEntry`. `remediation.tf` grants three actions, on every
+resource.
+
+Neither is on this site. Both are one click away from it.
+
+**Acceptance:** each README matches the file it describes.
 
 **Status:** open.
 

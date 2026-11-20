@@ -58,18 +58,18 @@
     },
     {
       "id": "capture",
-      "value": "77,959",
+      "value": "1",
       "unit": "",
-      "label": "events ingested from a live honeypot",
-      "detail": "A deliberately exposed host inside a locked down VPC streamed unsolicited internet traffic into Splunk. The attacker addresses in those dashboards are organic, not simulated.",
+      "label": "line of Terraform closed an exposed database",
+      "detail": "A PostgreSQL database was left open to the internet on purpose. A scripted attack ran against it, real scanners showed up uninvited, and one changed line made it unreachable from outside the VPC.",
       "icon": "Radar"
     },
     {
       "id": "iac",
-      "value": "100",
-      "unit": "%",
-      "label": "of this stack is code",
-      "detail": "No console clicks. Every bucket, role, function, table and DNS record lives in a Terraform module.",
+      "value": "42",
+      "unit": "",
+      "label": "resources in production, every one in Terraform",
+      "detail": "Every bucket, role, function, table, certificate and DNS record lives in a Terraform module. The only clicks were registering the domain and setting up sign in.",
       "icon": "FileCode"
     },
     {
@@ -94,8 +94,8 @@
           "label": "ATT&CK techniques"
         },
         {
-          "value": "Under 60s",
-          "label": "alert to containment"
+          "value": "30s",
+          "label": "hard limit on the containment Lambda"
         },
         {
           "value": "5 panels",
@@ -173,11 +173,11 @@
       "id": "honeypot",
       "eyebrow": "Live threat research",
       "title": "AWS Incident Response Honeypot",
-      "summary": "A deliberately exposed host inside a locked down VPC, provisioned by Terraform, that streamed unsolicited attack traffic into Splunk. The threat actor data in these dashboards is organic, not simulated.",
+      "summary": "A PostgreSQL database left open to the internet on purpose, provisioned by Terraform, with flow logs feeding Splunk. A scripted attack ran against it, real internet scanners turned up in the same capture, and one changed line of Terraform made it unreachable from outside the VPC.",
       "metrics": [
         {
-          "value": "Real traffic",
-          "label": "no synthetic data"
+          "value": "Real scanners",
+          "label": "arrived beside the scripted attack"
         }
       ],
       "stack": [
@@ -208,7 +208,7 @@
       "id": "cloud-resume",
       "eyebrow": "This page",
       "title": "Serverless Resume Platform",
-      "summary": "React on a private S3 bucket behind CloudFront, a Python Lambda counting visits in DynamoDB, and a pipeline that plans before a human approves the apply.",
+      "summary": "React on a private S3 bucket behind CloudFront, a Python Lambda counting visits in DynamoDB, and two pipelines that deploy it with no stored AWS keys.",
       "metrics": [
         {
           "value": "Keyless",
@@ -322,9 +322,11 @@
       "location": "Kansas City, Missouri",
       "summary": "Becoming Technologists, a residency where project teams run a simulated consulting firm through design sprints for a real client.",
       "bullets": [
-        "Working a live client engagement on a three person project team through consecutive design sprints, in a program that normally staffs a team at four to five.",
-        "Publishing a weekly build log of the cycle on dev.to under the series name i.c.stars Cycle 7. Week one is in the newsroom below.",
-        "Serving as the cohort documentarian for the guest speaker series, writing recap one pagers and publishing them to the program SharePoint."
+        "Solutions analyst and quality engineer on a three person team building a governed answer assistant for a nonprofit client with volunteer run chapters in many countries.",
+        "Designed it so rules decide every answer before any AI model runs. It answers only from approved documents that apply to the asker's chapter, shows the source and its effective date, and hands the question to a person when it cannot answer safely.",
+        "Wrote the ten question test set the team treats as the contract, five answers and five refusals. The browser prototype passes all ten, and the team has presented it to the client at two sprint reviews.",
+        "Now building the back end in C#, Blazor and PostgreSQL in Docker, so the same rules and the same tests run against a real database.",
+        "Runs the guest speaker series for the cohort as its High Tea ambassador, leads a weekly cohort meeting on career paths, and writes a weekly build log of the cycle on dev.to. Week one is in the newsroom below."
       ]
     },
     {
@@ -400,10 +402,16 @@
         "icon": "Cpu"
       },
       {
-        "name": "HashiCorp Certified Terraform Associate",
-        "issuer": "HashiCorp",
-        "status": "In progress",
-        "icon": "FileCode"
+        "name": "ITIL 4 Foundation",
+        "issuer": "PeopleCert, through WGU",
+        "status": "Exam prep",
+        "icon": "Server"
+      },
+      {
+        "name": "CompTIA A+",
+        "issuer": "CompTIA, through WGU",
+        "status": "This term at WGU",
+        "icon": "Cpu"
       }
     ],
     "education": [
