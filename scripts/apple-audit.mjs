@@ -10,16 +10,16 @@
  * This script replaces the opinion with measurement. It loads Apple's live
  * flagship pages, reads the computed styles the browser actually resolved, and
  * diffs them against the tokens in src/index.css. The output is a table of real
- * deltas. You read it once, decide which handful matter, write those as fixed
- * numeric criteria in BACKLOG.md, and close J3 permanently.
+ * deltas. You read it once, decide which handful matter, and write those down
+ * as fixed numeric criteria.
  *
  * It is a snapshot to decide against, not a target to chase. Apple ships
  * redesigns on their schedule.
  *
  * WHERE IT CAN RUN
  *
- * Anywhere Chromium can reach apple.com. That means your Mac, and it means a
- * Claude Code cloud session only if that environment's network access allows
+ * Anywhere Chromium can reach apple.com. That means a laptop, and it means a
+ * hosted cloud session only if that environment's network access allows
  * apple.com. The default "Trusted" access level does not: it covers package
  * registries and little else, and apple.com comes back as a refused CONNECT.
  * Check the environment's network access setting before assuming.
@@ -285,7 +285,7 @@ L.push("");
 L.push(`Measured ${new Date().toISOString().slice(0, 10)} at ${VIEWPORT.width}x${VIEWPORT.height}.`);
 L.push("");
 L.push("A snapshot to decide against, not a target to chase. Pick the deltas that");
-L.push("matter, write them into BACKLOG.md as fixed numbers, and close J3.");
+L.push("matter and write them down as fixed numbers.");
 L.push("");
 if (failures.length) {
   L.push(`> ${failures.length} page(s) failed to load: ${failures.map((f) => f.url).join(", ")}`);

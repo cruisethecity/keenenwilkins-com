@@ -1,13 +1,25 @@
-# Apple styled Cloud Resume
+# keenenwilkins.com
 
-A single page React resume in Apple's flagship product page design language, served from a private S3 bucket through CloudFront, with a Python serverless visitor counter, provisioned entirely by modular Terraform and deployed by GitHub Actions with no AWS access keys anywhere.
+Live at [keenenwilkins.com](https://keenenwilkins.com).
 
-Built as an upgraded take on the sixteen step AWS Cloud Resume Challenge.
+My build of the [AWS Cloud Resume Challenge](https://cloudresumechallenge.dev/docs/the-challenge/aws/). A single page React resume served from a private S3 bucket through CloudFront, with a Python visitor counter on Lambda and DynamoDB. The infrastructure is modular Terraform, and GitHub Actions deploys it over OpenID Connect with no stored AWS credentials.
 
 **Keenen Wilkins.** Cloud Architecture and DevSecOps. Kansas City, Missouri.
-[GitHub](https://github.com/cruisethecity) · [LinkedIn](https://www.linkedin.com/in/keenenw)
+[Site](https://keenenwilkins.com) · [GitHub](https://github.com/cruisethecity) · [LinkedIn](https://www.linkedin.com/in/keenenw)
 
 ---
+
+## Where to look first
+
+| To see | Open |
+| --- | --- |
+| How CI signs in to AWS with no keys | [terraform/modules/github_oidc](terraform/modules/github_oidc) |
+| The private bucket, CloudFront and the security headers | [terraform/modules/static_site](terraform/modules/static_site) |
+| The counter, and why two visits at once cannot lose a count | [backend/src/visitor_counter/handler.py](backend/src/visitor_counter/handler.py) |
+| Both pipelines | [.github/workflows](.github/workflows) |
+| All sixteen challenge steps, scored against this repo | [CHALLENGE.md](CHALLENGE.md) |
+| Diagrams and the resource inventory | [docs/architecture.md](docs/architecture.md) |
+| Local setup through first deploy | [docs/runbook.md](docs/runbook.md) |
 
 ## Stack
 
@@ -18,90 +30,41 @@ Built as an upgraded take on the sixteen step AWS Cloud Resume Challenge.
 | Motion | Motion (Framer Motion) | One easing curve, scroll reveals, reduced motion respected |
 | Icons | Lucide React | Tree shaken through an explicit registry |
 | Content | Local markdown | Parsed at build time, sanitized with DOMPurify |
-| API | API Gateway HTTP API | A third of the cost of a REST API for a proxy integration |
+| API | API Gateway HTTP API | Cheaper than a REST API for a proxy integration |
 | Compute | Lambda, Python 3.11, arm64 | Graviton pricing, no native wheels needed |
 | Data | DynamoDB on demand | Atomic `ADD` increment, no lost updates |
-| Delivery | CloudFront with OAC | Bucket stays fully private |
+| Delivery | CloudFront with Origin Access Control | Bucket stays fully private |
 | IaC | Terraform, six modules | Remote state in S3, locked in DynamoDB |
 | CI/CD | GitHub Actions with OIDC | Zero long lived credentials |
-| Tests | pytest and moto | Eighteen tests, no AWS account required |
+| Tests | pytest and moto | Eighteen tests, no AWS account required, 90 percent coverage floor in CI |
 
 ## Layout
 
 ```
 keenenwilkins-com/
-├── .github/workflows/
-│   ├── frontend-deploy.yml       build, sync to S3, invalidate CloudFront
-│   └── backend-deploy.yml        pytest, checkov, plan, gated apply
-│
+├── .github/workflows/        frontend deploy, backend test, plan and apply
 ├── backend/
-│   ├── src/visitor_counter/
-│   │   ├── __init__.py
-│   │   └── handler.py            atomic increment, strict CORS, JSON logs
-│   ├── tests/
-│   │   └── test_handler.py       18 tests across happy path, CORS, failures
-│   ├── pyproject.toml            pytest and ruff configuration
-│   ├── requirements.txt          empty on purpose, boto3 ships in the runtime
-│   └── requirements-dev.txt
-│
+│   ├── src/visitor_counter/  the Lambda: atomic increment, strict CORS, JSON logs
+│   └── tests/                18 tests with pytest and moto
 ├── frontend/
-│   ├── public/
-│   │   ├── favicon.svg
-│   │   └── resume/               drop the real PDF here
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── primitives/
-│   │   │   │   ├── Reveal.jsx            scroll reveal wrapper
-│   │   │   │   └── Section.jsx           eyebrow, headline, lede shell
-│   │   │   ├── GlassHeader.jsx           sticky bg-black/75 nav
-│   │   │   ├── TelemetryBadge.jsx        pulsing dot, live DynamoDB count
-│   │   │   ├── ScrollProgress.jsx        spring smoothed progress line
-│   │   │   ├── HeroStage.jsx             parallax hero, fluid display type
-│   │   │   ├── HighlightRail.jsx         oversized stat tiles
-│   │   │   ├── ProLineup.jsx             bento grid of projects
-│   │   │   ├── TechSpecs.jsx             Apple specification table
-│   │   │   ├── ExperienceRail.jsx        timeline
-│   │   │   ├── CredentialWall.jsx        certifications and education
-│   │   │   ├── Newsroom.jsx              markdown post index
-│   │   │   ├── ArticleReader.jsx         sanitized article view
-│   │   │   ├── ContactBand.jsx           closing call to action
-│   │   │   └── SiteFooter.jsx
-│   │   ├── content/posts/*.md            the newsroom, three write ups
-│   │   ├── data/resumeData.json          all resume content, one file
-│   │   ├── hooks/useVisitorCount.js      session guarded counter fetch
-│   │   ├── lib/
-│   │   │   ├── icons.jsx                 explicit icon registry
-│   │   │   ├── markdown.js               frontmatter, marked, DOMPurify
-│   │   │   └── motion.js                 easing and variant vocabulary
-│   │   ├── App.jsx                       hash routing between the two views
-│   │   ├── main.jsx
-│   │   └── index.css                     the design system
-│   ├── eslint.config.js
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-│
+│   ├── public/               images, the link preview card, the resume PDF
+│   ├── scripts/              pulls dev.to posts into the newsroom data
+│   └── src/
+│       ├── components/       one file per page section
+│       ├── content/posts/    the newsroom write ups, in markdown
+│       ├── data/             resumeData.json, the resume content in one file
+│       ├── hooks/            the session guarded counter fetch
+│       └── index.css         the design tokens
+├── scripts/
+│   ├── verify.sh             every local gate in one command
+│   ├── build-resume.mjs      prints the resume PDF from resumeData.json
+│   ├── build-og.mjs          draws the link preview card
+│   └── apple-audit.mjs       measures Apple's live pages against this site
 ├── terraform/
-│   ├── bootstrap/                state bucket and lock table, run once
-│   ├── environments/prod/        the composition root
-│   │   ├── backend.tf            partial S3 backend config
-│   │   ├── main.tf               wires the modules together
-│   │   ├── providers.tf          default region plus us-east-1 alias
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-│   │   └── terraform.tfvars.example
-│   └── modules/
-│       ├── acm/                  certificate in us-east-1, DNS validated
-│       ├── dns/                  Route 53 alias records
-│       ├── dynamodb/             counter table
-│       ├── github_oidc/          provider plus three scoped CI roles
-│       ├── lambda_api/           function, role, HTTP API, alarms
-│       └── static_site/          private bucket, OAC, CloudFront, headers
-│
-└── docs/
-    ├── architecture.md           Mermaid diagrams and resource inventory
-    ├── runbook.md                local setup through first deploy
-    └── CONTENT-TODO.md           what to verify before publishing
+│   ├── bootstrap/            state bucket and lock table, run once
+│   ├── environments/prod/    the composition root
+│   └── modules/              acm, dns, dynamodb, github_oidc, lambda_api, static_site
+└── docs/                     architecture, runbook, the design audit
 ```
 
 ## Quick start
@@ -126,28 +89,26 @@ echo "VITE_API_BASE_URL=$(cd ../terraform/environments/prod && terraform output 
 npm run dev
 ```
 
+## Security posture
+
+- The S3 bucket is fully private. Public access is blocked at the bucket level, and the bucket policy grants `s3:GetObject` to the CloudFront service principal only when the request carries this distribution's ARN.
+- HTTPS is enforced. A bucket policy statement denies all S3 actions when `aws:SecureTransport` is false.
+- Security headers are set at the edge: HSTS with preload, a Content Security Policy that starts from `default-src 'none'`, frame options deny, a referrer policy and a permissions policy.
+- The Lambda's data access is two DynamoDB actions, `GetItem` and `UpdateItem`, on one table.
+- The CORS allowlist is exact. An unrecognized origin gets a 403, not a missing header.
+- API Gateway is throttled to 25 requests per second with a burst of 50.
+- CI authenticates by OIDC. Trust policies pin the repository, the branch and the environment. Plan and apply use different roles, and the plan role is read only.
+- The apply role's IAM permissions are confined to a resource name prefix, with an explicit deny on user and access key creation that no allow can override.
+- Markdown is sanitized with DOMPurify before it reaches the DOM, even though every file is local.
+
 ## Design notes
 
 **No hyphens in readable copy.** A deliberate constraint on this build. Every sentence on the page uses commas, periods, or a rewrite, and date ranges use the word "to". Hyphens appear only in code, paths and class names.
 
-**One easing curve.** `cubic-bezier(0.16, 1, 0.3, 1)`, applied at three amplitudes. That single constraint is most of what separates a page that feels designed from one that feels decorated.
+**One easing curve.** `cubic-bezier(0.16, 1, 0.3, 1)`, applied at three amplitudes.
 
-**Fluid display type.** The headline is `clamp(2.75rem, 9vw, 7.5rem)` with negative letter spacing. At display sizes, default tracking looks loose, which is why every Apple headline sits near minus four percent.
-
-**Glass, properly.** A translucent fill, a backdrop blur with saturation so color bleeds through, and a one pixel top highlight. Missing any of the three gives you a gray box.
-
-## Security posture
-
-- S3 bucket is fully private. Public access blocked at the bucket level, and the bucket policy grants `s3:GetObject` to the CloudFront service principal only when the request carries this distribution's ARN.
-- HTTPS enforced. A bucket policy statement denies all S3 actions when `aws:SecureTransport` is false.
-- Security headers set at the edge: HSTS with preload, a Content Security Policy with `default-src 'none'`, frame options deny, referrer policy, permissions policy.
-- Lambda execution role holds two DynamoDB actions on one table ARN and nothing else. No managed policies, no wildcard resources.
-- CORS allowlist is exact. An unrecognized origin gets a 403, not a missing header.
-- API Gateway throttled to twenty five requests per second with a burst of fifty.
-- CI authenticates by OIDC. Trust policies pin the repository, the branch and the environment. Plan and apply use different roles.
-- The apply role's IAM permissions are confined to a resource name prefix, with an explicit deny on user and access key creation that no allow can override.
-- Markdown is sanitized with DOMPurify before it reaches the DOM, even though every file is local.
+**Measured, not eyeballed.** `scripts/apple-audit.mjs` reads the computed styles off Apple's live product pages and compares them with this site's tokens. [docs/apple-audit.md](docs/apple-audit.md) records what changed as a result.
 
 ## Cost
 
-Under one dollar a month at portfolio traffic. DynamoDB on demand and Lambda both round to nothing at this volume, CloudFront's free tier covers the requests, and the bucket holds a few hundred kilobytes. The largest line item is Route 53 at fifty cents per hosted zone, and that only exists once a custom domain is switched on.
+About fifty cents a month when idle, which is the Route 53 hosted zone, plus the yearly renewal of the domain. DynamoDB on demand and Lambda both round to nothing at this volume, and CloudFront's free tier covers the requests.

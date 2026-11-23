@@ -224,7 +224,8 @@
       ],
       "status": "Live",
       "accent": "glow",
-      "icon": "Cloud"
+      "icon": "Cloud",
+      "repo": "https://github.com/cruisethecity/keenenwilkins-com"
     },
     {
       "id": "logvault",

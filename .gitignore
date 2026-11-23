@@ -47,3 +47,10 @@ backend.hcl
 .DS_Store
 .idea/
 .vscode/
+
+# working notes and tool instructions, kept on this machine only
+CLAUDE.md
+BACKLOG.md
+docs/CONTENT-TODO.md
+docs/ASSETS.md
+docs/github-profile-README.md
