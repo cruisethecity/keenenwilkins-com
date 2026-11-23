@@ -8,7 +8,7 @@ tags: [OIDC, IAM, GitHub Actions, STS]
 
 The fastest way to wire a pipeline to AWS is to create an IAM user, generate an access key, and paste the pair into repository secrets. It works in ten minutes. It also creates a credential that never expires, lives in a system you do not control, and grants the same access at three in the morning eighteen months from now as it does today.
 
-Nobody rotates those keys. I have never once seen it happen on a schedule.
+Nobody rotates those keys.
 
 OpenID Connect removes the credential entirely.
 
@@ -57,13 +57,15 @@ condition {
   test     = "StringLike"
   variable = "token.actions.githubusercontent.com:sub"
   values = [
-    "repo:cruisethecity/keenenwilkins-com:ref:refs/heads/main",
-    "repo:cruisethecity/keenenwilkins-com:environment:production",
+    "repo:cruisethecity@OWNER_ID/keenenwilkins-com@REPO_ID:ref:refs/heads/main",
+    "repo:cruisethecity@OWNER_ID/keenenwilkins-com@REPO_ID:environment:production",
   ]
 }
 ```
 
 Now only a run on the main branch, or a run that has already passed a protected environment gate, can get credentials at all.
+
+`OWNER_ID` and `REPO_ID` stand in for the numeric IDs GitHub now puts in the claim for newer repositories. The older form was `repo:owner/name`, with no numbers. This policy was first written in the older form, and the first deploy of this site failed on exactly that line, because the token and the policy no longer matched.
 
 The second condition matters just as much and is easy to forget:
 

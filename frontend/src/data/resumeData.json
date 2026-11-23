@@ -4,7 +4,7 @@
     "initials": "KW",
     "discipline": "Cloud Architecture and DevSecOps",
     "location": "Kansas City, Missouri",
-    "availability": "Available 2026",
+    "availability": "Available now",
     "resumePath": "/resume/keenen-wilkins-resume.pdf",
     "links": {
       "github": "https://github.com/cruisethecity",
@@ -44,8 +44,8 @@
       "Forged in operations.",
       "Engineered for the cloud."
     ],
-    "subheadline": "AWS Certified Solutions Architect. Built to withstand production traffic. Available 2026.",
-    "footnote": "Every resource behind this page was provisioned by Terraform and deployed by a pipeline that holds no AWS keys."
+    "subheadline": "AWS Certified Solutions Architect. Built to withstand production traffic. Available now.",
+    "footnote": "The infrastructure behind this page was provisioned by Terraform and is deployed by a pipeline that holds no AWS keys."
   },
   "highlights": [
     {
@@ -90,8 +90,8 @@
       "detail": "I own every piece of AWS infrastructure and all of the Terraform. Kenny Barr owns the Splunk detection engineering and the dashboard work.",
       "metrics": [
         {
-          "value": "T1110, T1071",
-          "label": "ATT&CK techniques"
+          "value": "T1496",
+          "label": "ATT&CK technique on the dashboard"
         },
         {
           "value": "30s",
@@ -126,7 +126,7 @@
           "width": 1891,
           "height": 872
         },
-        "alt": "Splunk dashboard titled Phase 1 Cryptojacking Detection. An endpoint malware event mapped to MITRE technique T1496 with high severity, an attack timeline broken out by source address, port sweep activity, a threat correlation summary, and a table of the top attacking addresses with their connection counts and targeted ports."
+        "alt": "Splunk dashboard titled Phase 1 Cryptojacking Detection. An endpoint malware event mapped to MITRE technique T1496 with high severity, an attack timeline broken out by source address, port sweep activity, a threat correlation summary, and a table of the top attacking addresses with their connection counts and targeted ports. One source address is redacted."
       },
       "repo": "https://github.com/cruisethecity/aws-devsecops-threat-pipeline",
       "feature": true
@@ -230,17 +230,18 @@
       "id": "logvault",
       "eyebrow": "Linux automation",
       "title": "RHEL LogVault Automation",
-      "summary": "Scheduled shell and systemd automation that collects, compresses and ships RHEL 9 journal data with integrity checks, so a rotated log cannot be quietly altered.",
+      "summary": "A Bash script on a RHEL 9 instance that archives the system logs and copies them to an S3 bucket. The instance signs in through an IAM role, so no access key is stored on the box.",
       "metrics": [
         {
-          "value": "RHEL 9",
-          "label": "hardened target"
+          "value": "No stored keys",
+          "label": "IAM role on the instance"
         }
       ],
       "stack": [
         "Bash",
-        "systemd",
-        "journald",
+        "AWS CLI",
+        "S3",
+        "IAM role",
         "RHEL 9"
       ],
       "status": "Shipped",
@@ -325,8 +326,8 @@
         "Solutions analyst and quality engineer on a three person team building a governed answer assistant for a nonprofit client with volunteer run chapters in many countries.",
         "Designed it so rules decide every answer before any AI model runs. It answers only from approved documents that apply to the asker's chapter, shows the source and its effective date, and hands the question to a person when it cannot answer safely.",
         "Wrote the ten question test set the team treats as the contract, five answers and five refusals. The browser prototype passes all ten, and the team has presented it to the client at two sprint reviews.",
-        "Now building the back end in C#, Blazor and PostgreSQL in Docker, so the same rules and the same tests run against a real database.",
-        "Runs the guest speaker series for the cohort as its High Tea ambassador, leads a weekly cohort meeting on career paths, and writes a weekly build log of the cycle on dev.to. Week one is in the newsroom below."
+        "Built the back end in C#, Blazor and PostgreSQL in Docker, and the team showed it running at the final client presentation.",
+        "Runs the guest speaker series for the cohort as its High Tea ambassador, leads a weekly cohort meeting on career paths, and writes a build log of the cycle on dev.to. Week one is in the newsroom below."
       ]
     },
     {

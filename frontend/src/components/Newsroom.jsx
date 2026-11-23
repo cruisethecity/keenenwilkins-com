@@ -87,7 +87,7 @@ export default function Newsroom({ posts, onOpenArticle }) {
       tone="gray"
       eyebrow="Newsroom"
       title="Write ups from the build."
-      lede="What broke, why it broke, and the decision I would make again. Written from real applies, not from documentation."
+      lede="What broke, why it broke, and the decision I would make again."
     >
       <motion.div
         initial="hidden"

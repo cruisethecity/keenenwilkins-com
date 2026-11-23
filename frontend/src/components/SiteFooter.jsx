@@ -56,9 +56,10 @@ export default function SiteFooter({ meta, nav, telemetry, onNavigate }) {
             visitors.
           </li>
           <li id="note-3" className="scroll-mt-24">
-            3. Every resource was provisioned by Terraform and deployed by
-            GitHub Actions using OpenID Connect. No long lived AWS credentials
-            are stored anywhere in the pipeline.
+            3. The infrastructure was provisioned by Terraform and is deployed
+            by GitHub Actions using OpenID Connect. The domain registration
+            and the account sign in were set up by hand. No long lived AWS
+            credentials are stored anywhere in the pipeline.
           </li>
         </ol>
 

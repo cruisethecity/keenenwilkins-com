@@ -206,7 +206,7 @@ export default function ProLineup({ projects }) {
       tone="dark"
       eyebrow="The lineup"
       title="Four more, same throughline."
-      lede="Every one of these reached a live environment, took real traffic or real attacker traffic, and taught me something a course could not."
+      lede="Each of these taught me something a course could not."
     >
       <motion.ul
         initial="hidden"
